@@ -38,6 +38,7 @@ const signIn = async (req, res) => {
 
   try {
     const existingUser = await userModel.findOne({ email: email });
+
     if (!existingUser) {
       return res
         .status(404)
@@ -47,7 +48,7 @@ const signIn = async (req, res) => {
     const matchPassword = await bcrypt.compare(password, existingUser.password);
 
     if (!matchPassword) {
-      return res.status(404).json({ message: "Invalid Credentials !" });
+      return res.status(404).json({ message: "Invalid Password !" });
     }
 
     const token = jwt.sign(
