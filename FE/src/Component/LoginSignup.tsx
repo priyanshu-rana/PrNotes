@@ -23,9 +23,12 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
         <Formik
           initialValues={{ email: "", password: "" }}
           onSubmit={(values) => {
-            signIn(values);
-            navigate("/");
-            localStorage.setItem("login", "User is Logged In");
+            signIn(values)
+              .then(() => {
+                navigate("/");
+                localStorage.setItem("login", "User is Logged In");
+              })
+              .catch((e) => console.log(e));
           }}
         >
           {(formprops) => (
