@@ -10,7 +10,7 @@ export const signUp = async (data: {
     .post("http://localhost:5000/user/signup", { ...data })
     .then((res) => {
       console.log(res);
-      alert("User Created Sucessfully !!");
+      // alert("User Created Sucessfully !!");
     })
     .catch((e) => alert(e.response.data.message));
 };
@@ -20,7 +20,7 @@ export const signIn = async (data: { email: string; password: string }) => {
     .post("http://localhost:5000/user/signin", { ...data })
     .then((res) => {
       console.log(res);
-      alert("User Login Successful");
+      // alert("User Login Successful");
     })
     .catch((e) => alert(e));
 };

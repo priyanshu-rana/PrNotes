@@ -1,19 +1,32 @@
-import { FC, memo, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import Signup from "./Signup";
 import { Formik } from "formik";
 import { signIn } from "../Service/ApiService";
+import { useNavigate } from "react-router-dom";
 
 type LoginSignupProps = {};
 
 const LoginSignup: FC<LoginSignupProps> = (props) => {
   const [isSignupForm, setIsSignupForm] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let login = localStorage.getItem("login");
+    if (login) {
+      navigate("/");
+    }
+  }, []);
   return !isSignupForm ? (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
       <div className="bg-white p-8 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Login</h1>
         <Formik
           initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => signIn(values)}
+          onSubmit={(values) => {
+            signIn(values);
+            navigate("/");
+            localStorage.setItem("login", "User is Logged In");
+          }}
         >
           {(formprops) => (
             <form className="flex flex-col" onSubmit={formprops.handleSubmit}>
