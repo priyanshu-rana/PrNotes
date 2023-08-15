@@ -19,12 +19,8 @@ app.use((req, res, next) => {
 app.use("/user", userRouter);
 app.use("/note", noteRouter);
 
-app.get("/", (req, res) => res.send("Notes API from MyNote"));
-
 mongoose
-  .connect(
-    `mongodb+srv://priyanshu_rana:Priyanshu%40Mongo@cluster0.iuhxu33.mongodb.net/notes_db?retryWrites=true`
-  )
+  .connect(process.env.MONGO_URL)
   .then(() => {
     app.listen(5000, () => {
       console.log("Server started at port no.5000");

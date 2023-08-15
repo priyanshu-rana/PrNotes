@@ -1,8 +1,9 @@
+require("dotenv").config();
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// const SECRET_KEY = process.env.SECRET_KEY;
-const SECRET_KEY = "note_app_secret_key";
+
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const signUp = async (req, res) => {
   const { first_name, last_name, password, email } = req.body;
