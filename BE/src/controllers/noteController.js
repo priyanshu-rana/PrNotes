@@ -46,7 +46,7 @@ const updateNote = async (req, res) => {
 };
 
 const deleteNote = async (req, res) => {
-  const noteId = req.params.noteId; //noteId is from paramas --> line.no 14 noteRoute
+  const noteId = req.params.noteId; //noteId is from paramas --> line.no 14 noteRoutes
   try {
     const note = await noteModel.findByIdAndDelete(noteId);
     res.status(202).json(note);
