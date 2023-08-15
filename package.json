@@ -1,0 +1,24 @@
+{
+  "name": "myawesomenotesapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd apps/FE && npm run dev",
+    "server": "cd apps/BE && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/priyanshu-rana/MyAwesomeNotesApp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/priyanshu-rana/MyAwesomeNotesApp/issues"
+  },
+  "homepage": "https://github.com/priyanshu-rana/MyAwesomeNotesApp#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
