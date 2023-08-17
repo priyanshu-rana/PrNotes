@@ -49,7 +49,7 @@ const HomePage: FC<HomePageProps> = (props) => {
         </button>
       </div>
       {!!notes.length && (
-        <div className="flex flex-col shrink-0 grow space-y-2 w-1/2">
+        <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
           {notes.map((n, i) => (
             <div
               className={`bg-white p-4 space-x-1 rounded-2xl flex items-center justify-between
@@ -58,7 +58,6 @@ const HomePage: FC<HomePageProps> = (props) => {
             >
               <div>
                 <div className="flex">
-                  {/* <h1>{n._id}</h1> */}
                   <h1>{i + 1}.</h1>
                   <h1>{n.title}</h1>
                 </div>

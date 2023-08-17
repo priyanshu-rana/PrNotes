@@ -1,5 +1,7 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+
+// const { REACT_APP_BACKEND_URL } = process.env;
+const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
 
 export const signUp = async (data: {
   first_name: string;
@@ -8,7 +10,7 @@ export const signUp = async (data: {
   last_name?: string;
 }) => {
   await axios
-    .post("http://localhost:5000/user/signup", { ...data })
+    .post(`${REACT_APP_BACKEND_URL}/user/signup`, { ...data })
     .then((res) => {
       console.log(res);
       // alert("User Created Sucessfully !!");
@@ -19,8 +21,11 @@ export const signUp = async (data: {
 export const signIn = async (data: { email: string; password: string }) => {
   try {
     await axios
-      .post("http://localhost:5000/user/signin", { ...data })
-      .then((res) => localStorage.setItem("login", res.data.token));
+      .post(`${REACT_APP_BACKEND_URL}/user/signin`, { ...data })
+      .then((res) => {
+        localStorage.setItem("login", res.data.token);
+        console.log("sigin sucessful");
+      });
     // return response
     // toast.success("LoggedIn Sucessfully!");
   } catch (error) {
@@ -38,7 +43,7 @@ export const createNote = async (
 ) => {
   await axios
     .post(
-      "http://localhost:5000/note",
+      `${REACT_APP_BACKEND_URL}/note`,
       { ...data },
       { headers: { Authorization: auth_token } }
     )
@@ -50,7 +55,7 @@ export const createNote = async (
 
 export const getNotes = async (auth_token?: string | null) => {
   try {
-    const response = await axios.get("http://localhost:5000/note", {
+    const response = await axios.get(`${REACT_APP_BACKEND_URL}/note`, {
       headers: { Authorization: auth_token },
     });
     return response.data;
@@ -64,7 +69,7 @@ export const deleteNote = async (
   auth_token: string | null
 ) => {
   try {
-    await axios.delete(`http://localhost:5000/note/${noteId}`, {
+    await axios.delete(`${REACT_APP_BACKEND_URL}/note/${noteId}`, {
       headers: { Authorization: auth_token },
     });
   } catch (error: any) {

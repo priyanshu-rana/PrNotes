@@ -7,9 +7,9 @@ const Header: FC<HeaderProps> = (props) => {
   const naviagate = useNavigate();
   return (
     <div className="flex justify-between">
-      <h1 className="text-3xl text-white font-bold">My Awesome Notes App</h1>
+      <h1 className="text-xl md:text-3xl text-pink-200 font-bold">NotesApp</h1>
       <button
-        className="text-3xl text-white font-bold"
+        className="text-xl md:text-3xl text-violet-200 font-bold"
         onClick={() => {
           localStorage.removeItem("login");
           naviagate("/");
