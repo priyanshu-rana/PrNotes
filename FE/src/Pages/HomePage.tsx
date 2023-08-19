@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { createNote, deleteNote, getNotes } from "../Service/ApiService";
-import { Input, Modal } from "antd";
+import { Button, Input, Modal } from "antd";
 import { Formik } from "formik";
 import Header from "../Component/Header";
 
@@ -26,6 +26,7 @@ const HomePage: FC<HomePageProps> = (props) => {
       })
       .catch((e) => toast.error(e));
   };
+
   useEffect(() => {
     const login = localStorage.getItem("login");
     if (!isLoaded) {
@@ -38,7 +39,7 @@ const HomePage: FC<HomePageProps> = (props) => {
   }, [isLoaded]);
 
   return (
-    <div className="h-screen p-10  bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
+    <div className="min-h-screen p-10  bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
       <Header />
       <div className="py-10 flex space-x-4">
         <button
@@ -48,7 +49,7 @@ const HomePage: FC<HomePageProps> = (props) => {
           + Add Note
         </button>
       </div>
-      {!!notes.length && (
+      {!!notes.length && isLoaded ? (
         <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
           {notes.map((n, i) => (
             <div
@@ -81,6 +82,14 @@ const HomePage: FC<HomePageProps> = (props) => {
             </div>
           ))}
         </div>
+      ) : (
+        <Button
+          loading={true}
+          className="border-none text-white text-5xl"
+          size={80 as any}
+        >
+          Loading
+        </Button>
       )}
       <ToastContainer />
       <Modal

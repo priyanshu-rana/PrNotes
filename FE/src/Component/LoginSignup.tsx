@@ -4,11 +4,13 @@ import { Formik } from "formik";
 import { signIn } from "../Service/ApiService";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { Button } from "antd";
 
 type LoginSignupProps = {};
 
 const LoginSignup: FC<LoginSignupProps> = (props) => {
   const [isSignupForm, setIsSignupForm] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +28,7 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
         <Formik
           initialValues={{ email: "", password: "" }}
           onSubmit={(values) => {
+            setIsLoading(true);
             signIn(values)
               .then(() => {
                 navigate("/");
@@ -33,7 +36,8 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
               .catch((e) => {
                 console.log(e);
                 toast.error(e);
-              });
+              })
+              .finally(() => setIsLoading(false));
           }}
         >
           {(formprops) => (
@@ -54,12 +58,14 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
                 placeholder="Password"
                 className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800"
               />
-              <button
-                type="submit"
-                className="bg-purple-600 text-white rounded py-2 px-4 hover:bg-purple-700"
+              <Button
+                htmlType="submit"
+                type="primary"
+                loading={isLoading}
+                className="bg-purple-600 text-white rounded  px-4 hover:bg-purple-700"
               >
                 Login
-              </button>
+              </Button>
             </form>
           )}
         </Formik>
