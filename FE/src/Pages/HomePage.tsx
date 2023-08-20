@@ -1,9 +1,16 @@
 import { FC, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { createNote, deleteNote, getNotes } from "../Service/ApiService";
+import {
+  createNote,
+  deleteNote,
+  getNotes,
+  updateNote,
+} from "../Service/ApiService";
 import { Button, Input, Modal } from "antd";
 import { Formik } from "formik";
 import Header from "../Component/Header";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
 
 type HomePageProps = {};
 
@@ -12,10 +19,15 @@ const HomePage: FC<HomePageProps> = (props) => {
     { _id: string; title: string; description: string }[]
   >([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [noteDataForUpdate, setNoteDataForUpdate] = useState<{
+    _id: string;
+    title: string;
+    description: string;
+  }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
 
   const handleCreateNote = (values: {
-    _id: string;
+    // _id: string;
     title: string;
     description: string;
   }) => {
@@ -23,6 +35,17 @@ const HomePage: FC<HomePageProps> = (props) => {
       .then(() => {
         setIsLoaded(false);
         toast.success("Note created successfully!");
+        setIsModalVisible(false);
+      })
+      .catch((e) => toast.error(e));
+  };
+
+  const handleUpdateNote = (data: { title?: string; description?: string }) => {
+    updateNote(noteDataForUpdate._id, data, localStorage.getItem("login"))
+      .then(() => {
+        setIsLoaded(false);
+        toast.success("Note updated successfully!");
+        setIsModalVisible(false);
       })
       .catch((e) => toast.error(e));
   };
@@ -32,14 +55,14 @@ const HomePage: FC<HomePageProps> = (props) => {
     if (!isLoaded) {
       getNotes(login).then((notes) => {
         setNotes(notes);
-        // toast.success("Notes fetched sucessfully!");
         setIsLoaded(true);
       });
     }
   }, [isLoaded]);
 
   return (
-    <div className="min-h-screen p-10  bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
+    // <div className="min-h-screen p-10 bg-gradient-to-br from-red-500 via-lime-400 to-blue-500">
+    <div className="min-h-screen p-10  bg-gradient-to-r from-gray-800 to-blue-900 ">
       <Header />
       <div className="py-10 flex space-x-4">
         <button
@@ -53,32 +76,43 @@ const HomePage: FC<HomePageProps> = (props) => {
         <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
           {notes.map((n, i) => (
             <div
-              className={`bg-white p-4 space-x-1 rounded-2xl flex items-center justify-between
+              className={`bg-white bg-opacity-20 text-white p-4 space-x-1 rounded-2xl flex items-center justify-between
               }`}
               key={n._id}
             >
               <div>
-                <div className="flex">
+                <div className="flex font-bold">
                   <h1>{i + 1}.</h1>
                   <h1>{n.title}</h1>
                 </div>
                 <h1>{n.description}</h1>
               </div>
-              <button
-                className="text-red-600 font-extrabold"
-                onClick={() => {
-                  deleteNote(n._id, localStorage.getItem("login"))
-                    .then(() => {
-                      setIsLoaded(false);
-                      toast.success("Note is deleted sucessfully!!");
-                    })
-                    .catch((e) => console.log(e));
+              <div className="flex space-x-4">
+                <button
+                  className="text-blue-200 font-extrabold"
+                  onClick={() => {
+                    setNoteDataForUpdate(n);
+                    setIsModalVisible(true);
+                  }}
+                >
+                  <FaEdit size={25} />
+                </button>
+                <button
+                  className="text-red-500 font-extrabold"
+                  onClick={() => {
+                    deleteNote(n._id, localStorage.getItem("login"))
+                      .then(() => {
+                        setIsLoaded(false);
+                        toast.success("Note is deleted sucessfully!!");
+                      })
+                      .catch((e) => console.log(e));
 
-                  // setNotes([...notes].filter((note) => note._id !== n._id));
-                }}
-              >
-                X
-              </button>
+                    // setNotes([...notes].filter((note) => note._id !== n._id));
+                  }}
+                >
+                  <RiDeleteBinLine size={25} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -96,11 +130,25 @@ const HomePage: FC<HomePageProps> = (props) => {
         open={isModalVisible}
         closable
         footer={false}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setNoteDataForUpdate({ _id: "", title: "", description: "" });
+        }}
+        title={!noteDataForUpdate._id ? "Add note" : "Update note"}
+        destroyOnClose
       >
         <Formik
-          onSubmit={handleCreateNote}
-          initialValues={{ _id: "", title: "", description: "" }}
+          onSubmit={
+            !noteDataForUpdate._id ? handleCreateNote : handleUpdateNote
+          }
+          initialValues={
+            !noteDataForUpdate
+              ? { _id: "", title: "", description: "" }
+              : {
+                  title: noteDataForUpdate.title,
+                  description: noteDataForUpdate.description,
+                }
+          }
         >
           {(formProps) => (
             <form className="py-10 space-y-5" onSubmit={formProps.handleSubmit}>
@@ -127,7 +175,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                 className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"
                 type="submit"
               >
-                + Add
+                {!noteDataForUpdate._id ? "+ Add" : "Update"}
               </button>
             </form>
           )}

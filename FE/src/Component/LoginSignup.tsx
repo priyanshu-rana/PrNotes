@@ -21,7 +21,8 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
   }, []);
 
   return !isSignupForm ? (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-800 to-blue-900">
+      {/*Can also use: via-green-800 */}
       <div className="bg-white p-8 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Login</h1>
         <ToastContainer />

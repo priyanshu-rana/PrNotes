@@ -13,7 +13,6 @@ export const signUp = async (data: {
     .post(`${REACT_APP_BACKEND_URL}/user/signup`, { ...data })
     .then((res) => {
       console.log(res);
-      // alert("User Created Sucessfully !!");
     })
     .catch((e) => alert(e.response.data.message));
 };
@@ -26,10 +25,7 @@ export const signIn = async (data: { email: string; password: string }) => {
         localStorage.setItem("login", res.data.token);
         console.log("sigin sucessful");
       });
-    // return response
-    // toast.success("LoggedIn Sucessfully!");
   } catch (error) {
-    // toast.error("Unable to Login!");
     console.log(error);
   }
 };
@@ -74,5 +70,21 @@ export const deleteNote = async (
     });
   } catch (error: any) {
     throw new Error("Unable to delete Note!", error);
+  }
+};
+
+export const updateNote = async (
+  noteId: string | number,
+  data: { title?: string; description?: string },
+  auth_token: string | null
+) => {
+  try {
+    await axios.put(
+      `${REACT_APP_BACKEND_URL}/note/${noteId}`,
+      { ...data },
+      { headers: { Authorization: auth_token } }
+    );
+  } catch (error) {
+    console.log(error);
   }
 };
