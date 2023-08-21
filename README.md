@@ -1,5 +1,5 @@
 
-# MyAwesomeNotesApp
+# PrNotes
 
 ### Steps to run project / Installation:
 1. Clone the Repo
