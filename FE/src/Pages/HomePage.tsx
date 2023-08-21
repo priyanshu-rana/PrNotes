@@ -11,18 +11,19 @@ import { Formik } from "formik";
 import Header from "../Component/Header";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
+import { MdDoneAll, MdRemoveDone } from "react-icons/md";
 
 type HomePageProps = {};
 
 const HomePage: FC<HomePageProps> = (props) => {
   const [notes, setNotes] = useState<
-    { _id: string; title: string; description: string }[]
+    { _id: string; title: string; description: string; done: boolean }[]
   >([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [noteDataForUpdate, setNoteDataForUpdate] = useState<{
     _id: string;
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -40,12 +41,25 @@ const HomePage: FC<HomePageProps> = (props) => {
       .catch((e) => toast.error(e));
   };
 
-  const handleUpdateNote = (data: { title?: string; description?: string }) => {
+  const handleUpdateNote = (data: {
+    title?: string;
+    description?: string;
+    done?: boolean;
+  }) => {
     updateNote(noteDataForUpdate._id, data, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note updated successfully!");
         setIsModalVisible(false);
+      })
+      .catch((e) => toast.error(e));
+  };
+
+  const handleMarkNote = async (noteId: string, done: boolean) => {
+    await updateNote(noteId, { done }, localStorage.getItem("login"))
+      .then(() => {
+        setIsLoaded(false);
+        setNoteDataForUpdate({ _id: "", description: "", title: "" });
       })
       .catch((e) => toast.error(e));
   };
@@ -80,7 +94,7 @@ const HomePage: FC<HomePageProps> = (props) => {
               }`}
               key={n._id}
             >
-              <div>
+              <div className={n.done ? "line-through text-green-300" : ""}>
                 <div className="flex font-bold">
                   <h1>{i + 1}.</h1>
                   <h1>{n.title}</h1>
@@ -88,6 +102,27 @@ const HomePage: FC<HomePageProps> = (props) => {
                 <h1>{n.description}</h1>
               </div>
               <div className="flex space-x-4">
+                <button
+                  className={n.done ? "text-green-400" : "text-red-400"}
+                  onClick={() => {
+                    setNoteDataForUpdate({ _id: n._id });
+                    handleMarkNote(n._id, !n.done ? true : false)
+                      .then(() =>
+                        !n.done
+                          ? toast.success(`Great, you have done: ${n.title}`)
+                          : toast.success(
+                              `Opps, removed ' ${n.title} ' from done`
+                            )
+                      )
+                      .catch((e) => console.log(e));
+                  }}
+                >
+                  {n.done ? (
+                    <MdRemoveDone size={25} />
+                  ) : (
+                    <MdDoneAll size={25} />
+                  )}
+                </button>
                 <button
                   className="text-blue-200 font-extrabold"
                   onClick={() => {
@@ -145,8 +180,8 @@ const HomePage: FC<HomePageProps> = (props) => {
             !noteDataForUpdate
               ? { _id: "", title: "", description: "" }
               : {
-                  title: noteDataForUpdate.title,
-                  description: noteDataForUpdate.description,
+                  title: noteDataForUpdate.title || "",
+                  description: noteDataForUpdate.description || "",
                 }
           }
         >

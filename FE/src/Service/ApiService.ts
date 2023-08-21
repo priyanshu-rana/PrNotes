@@ -75,7 +75,7 @@ export const deleteNote = async (
 
 export const updateNote = async (
   noteId: string | number,
-  data: { title?: string; description?: string },
+  data: { title?: string; description?: string; done?: boolean },
   auth_token: string | null
 ) => {
   try {

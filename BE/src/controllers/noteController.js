@@ -32,9 +32,14 @@ const getNotes = async (req, res) => {
 
 const updateNote = async (req, res) => {
   const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
-  const { title, description } = req.body;
+  const { title, description, done } = req.body;
 
-  const newNote = { title: title, description: description, userId: req.id };
+  const newNote = {
+    title: title,
+    description: description,
+    done: done,
+    userId: req.id,
+  };
 
   try {
     await noteModel.findByIdAndUpdate(noteId, newNote, { new: true });
@@ -44,7 +49,6 @@ const updateNote = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 const deleteNote = async (req, res) => {
   const noteId = req.params.noteId; //noteId is from paramas --> line.no 14 noteRoutes
   try {

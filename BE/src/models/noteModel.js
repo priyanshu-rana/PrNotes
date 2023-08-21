@@ -15,6 +15,10 @@ const NoteSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    done: {
+      type: Boolean,
+      required: false,
+    },
   },
   { timestamps: true }
 );
