@@ -1,15 +1,17 @@
 const noteModel = require("../models/noteModel");
-
 // CRUD --> Create, Read, Update, Delete
 
 const createNote = async (req, res) => {
   const { title, description } = req.body;
+  const file = req.file;
+  const fileName = file?.filename;
 
   const newNote = new noteModel({
     //what is new keyword in js
     title: title,
     description: description,
     userId: req.userId,
+    image: `http://localhost:5000/note/image/${fileName}`, //TODO -> add baseurl in place of loacal server
   });
   try {
     await newNote.save();
