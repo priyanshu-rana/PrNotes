@@ -18,12 +18,16 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  //  limits: { fileSize: 1000 }
+});
+const imageUpload = upload.single("image");
 
 noteRouter.use("/image", express.static("./uploads"));
 noteRouter.post("/", auth, upload.single("image"), createNote);
 noteRouter.get("/", auth, getNotes);
-noteRouter.put("/:noteId", auth, updateNote);
+noteRouter.put("/:noteId", auth, imageUpload, updateNote);
 noteRouter.delete("/:noteId", auth, deleteNote);
 
 module.exports = noteRouter;

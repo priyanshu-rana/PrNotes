@@ -1,13 +1,25 @@
-import { Input, Modal } from "antd";
+import { Button, Input, Modal, Upload } from "antd";
 import { Formik } from "formik";
 import { FC, memo } from "react";
+
+export type NoteType = {
+  title: string;
+  description: string;
+  image?: File | null | string;
+  done?: boolean;
+};
 
 type CreateOrUpdateNoteModalProps = {
   open: boolean;
   onCancel: () => void;
-  noteDataForUpdate: { _id: string; title?: string; description?: string };
-  handleCreateNote: (data: { title: string; description: string }) => void;
-  handleUpdateNote: (data: { title: string; description: string }) => void;
+  noteDataForUpdate: {
+    _id: string;
+    title?: string;
+    description?: string;
+    image?: any;
+  };
+  handleCreateNote: (data: NoteType) => void;
+  handleUpdateNote: (data: NoteType) => void;
 };
 
 const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
@@ -30,10 +42,11 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
         onSubmit={!noteDataForUpdate._id ? handleCreateNote : handleUpdateNote}
         initialValues={
           !noteDataForUpdate
-            ? { _id: "", title: "", description: "" }
+            ? { _id: "", title: "", description: "", image: null }
             : {
                 title: noteDataForUpdate.title || "",
                 description: noteDataForUpdate.description || "",
+                // image: noteDataForUpdate.image || null,
               }
         }
       >
@@ -58,6 +71,32 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
               />
             </div>
 
+            <div>
+              {/* <Upload>
+                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+              </Upload> */}
+              <label htmlFor="Attachment">Attachment</label>
+              <Input
+                type="file"
+                // value={formProps.values.image}
+                onChange={(e) => {
+                  const file = e.currentTarget.files
+                    ? e.currentTarget.files[0]
+                    : null;
+
+                  console.log("e.currentTarget.files", file);
+                  formProps.setFieldValue("image", file);
+                }}
+                suffix={
+                  <Button
+                    className="hover:text-red-500"
+                    onClick={() => formProps.setFieldValue("image", null)}
+                  >
+                    X
+                  </Button>
+                }
+              />
+            </div>
             <button
               className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"
               type="submit"

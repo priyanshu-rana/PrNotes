@@ -31,23 +31,35 @@ export const signIn = async (data: { email: string; password: string }) => {
   }
 };
 
-export const createNote = async (
-  data: {
-    title: string;
-    description: string;
-  },
-  auth_token: string | null
-) => {
+export const createNote = async (data: FormData, auth_token: string | null) => {
   await axios
-    .post(
-      `${REACT_APP_BACKEND_URL}/note`,
-      { ...data },
-      { headers: { Authorization: auth_token } }
-    )
+    .post(`${REACT_APP_BACKEND_URL}/note`, data, {
+      headers: {
+        Authorization: auth_token,
+        // "Content-Type": "multipart/form-data",
+      },
+    })
     .then((res) => res)
     .catch((e) => {
       throw e;
     });
+};
+
+export const updateNote = async (
+  noteId: string | number,
+  data: FormData | boolean,
+  auth_token: string | null
+) => {
+  try {
+    await axios.put(`${REACT_APP_BACKEND_URL}/note/${noteId}`, data, {
+      headers: {
+        Authorization: auth_token,
+        // "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const getNotes = async (auth_token?: string | null) => {
@@ -71,21 +83,5 @@ export const deleteNote = async (
     });
   } catch (error: any) {
     throw new Error("Unable to delete Note!", error);
-  }
-};
-
-export const updateNote = async (
-  noteId: string | number,
-  data: { title?: string; description?: string; done?: boolean },
-  auth_token: string | null
-) => {
-  try {
-    await axios.put(
-      `${REACT_APP_BACKEND_URL}/note/${noteId}`,
-      { ...data },
-      { headers: { Authorization: auth_token } }
-    );
-  } catch (error) {
-    console.log(error);
   }
 };

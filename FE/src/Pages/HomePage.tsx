@@ -11,7 +11,9 @@ import Header from "../Component/Header";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 import { MdDoneAll, MdRemoveDone } from "react-icons/md";
-import CreateOrUpdateNoteModal from "../Component/CreateOrUpdateNoteModal";
+import CreateOrUpdateNoteModal, {
+  NoteType,
+} from "../Component/CreateOrUpdateNoteModal";
 
 type HomePageProps = {};
 
@@ -33,12 +35,14 @@ const HomePage: FC<HomePageProps> = (props) => {
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const handleCreateNote = (data: {
-    // _id: string;
-    title: string;
-    description: string;
-  }) => {
-    createNote(data, localStorage.getItem("login"))
+  const handleCreateNote = (data: NoteType) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+    createNote(formData, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note created successfully!");
@@ -47,22 +51,28 @@ const HomePage: FC<HomePageProps> = (props) => {
       .catch((e) => toast.error(e));
   };
 
-  const handleUpdateNote = (data: {
-    title?: string;
-    description?: string;
-    done?: boolean;
-  }) => {
-    updateNote(noteDataForUpdate._id, data, localStorage.getItem("login"))
+  const handleUpdateNote = (data: NoteType) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+
+    updateNote(noteDataForUpdate._id, formData, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note updated successfully!");
         setIsModalVisible(false);
+        setNoteDataForUpdate({ _id: "", title: "", description: "" });
       })
       .catch((e) => toast.error(e));
   };
 
   const handleMarkNote = async (noteId: string, done: boolean) => {
-    await updateNote(noteId, { done }, localStorage.getItem("login"))
+    const formData = new FormData();
+    formData.append("done", `${done}`);
+    await updateNote(noteId, formData, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         setNoteDataForUpdate({ _id: "", description: "", title: "" });
@@ -159,9 +169,6 @@ const HomePage: FC<HomePageProps> = (props) => {
                     <RiDeleteBinLine size={25} />
                   </button>
                 </div>
-                {/* <div className="w-40">
-                <Image src={n.image} />
-              </div> */}
               </div>
               {n.image && (
                 <Collapse
