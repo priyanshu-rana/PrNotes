@@ -17,7 +17,9 @@ const noteRouter = express.Router();
 const storage = multer.memoryStorage();
 
 admin.initializeApp({
-  credential: admin.credential.cert(firebaseConfig),
+  credential: admin.credential.cert(JSON.parse(firebaseConfig)),
+  // credential: admin.credential.cert(credentials),
+
   storageBucket: "gs://prnotes-7c669.appspot.com",
 });
 
