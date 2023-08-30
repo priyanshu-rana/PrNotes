@@ -5,7 +5,7 @@ import { FC, memo } from "react";
 export type NoteType = {
   title: string;
   description: string;
-  image?: File | null | string;
+  image?: File | null;
   done?: boolean;
 };
 

@@ -1,21 +1,24 @@
 const express = require("express");
 const multer = require("multer");
+const auth = require("../middlewares/auth");
+const admin = require("firebase-admin");
+const firebaseConfig = require("../../firebase.conf");
+// const serviceAccount = require("../../");
+// firebase-adminsdk-mbuer@prnotes-7c669.iam.gserviceaccount.com
+
 const {
   createNote,
   getNotes,
   updateNote,
   deleteNote,
 } = require("../controllers/noteController");
-const auth = require("../middlewares/auth");
-const noteRouter = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+const noteRouter = express.Router();
+const storage = multer.memoryStorage();
+
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseConfig),
+  storageBucket: "gs://prnotes-7c669.appspot.com",
 });
 
 const upload = multer({
@@ -24,8 +27,8 @@ const upload = multer({
 });
 const imageUpload = upload.single("image");
 
-noteRouter.use("/image", express.static("./uploads"));
-noteRouter.post("/", auth, upload.single("image"), createNote);
+// noteRouter.use("/image", express.static("./uploads"));
+noteRouter.post("/", auth, imageUpload, createNote);
 noteRouter.get("/", auth, getNotes);
 noteRouter.put("/:noteId", auth, imageUpload, updateNote);
 noteRouter.delete("/:noteId", auth, deleteNote);

@@ -1,47 +1,99 @@
+const admin = require("firebase-admin");
 const noteModel = require("../models/noteModel");
-// const fs = require("fs-extra");
-// CRUD --> Create, Read, Update, Delete
-const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
-const createNote = async (req, res) => {
-  const { title, description } = req.body;
-  const file = req.file;
-  const fileName = file?.filename;
+// const UUID = require("uuidv4");
 
-  const newNote = new noteModel({
-    //what is new keyword in js
-    title: title,
-    description: description,
-    userId: req.userId,
-    image: file ? `${REACT_APP_BACKEND_URL}/note/image/${fileName}` : null,
-  });
+const createNote = async (req, res) => {
   try {
-    await newNote.save();
-    res.status(201).json(newNote);
+    const { title, description } = req.body;
+    const file = req.file;
+    // let uuid = UUID;
+    const bucket = admin.storage().bucket("gs://prnotes-7c669.appspot.com");
+    const fileName = `${Date.now()}-${file?.originalname}`;
+    const blob = bucket.file(fileName);
+    const blobStream = blob.createWriteStream();
+
+    blobStream.on("error", (err) => {
+      console.log("Error while uploading image", err);
+      res.status(500).json({ error: "Image upload failed!" });
+    });
+    blobStream.on("finish", async () => {
+      const signedUrlConfig = {
+        action: "read",
+        // expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
+        expires: Date.now() + 315532800, // URL expires in 10 years {approx}
+      };
+      // const imageResponse = await bucket.upload(
+      //   "gs://prnotes-7c669.appspot.com",
+      //   {
+      //     destination: `image/${file?.originalname}`,
+      //     resumable: true,
+      //     metadata: {
+      //       metadata: {
+      //         firebaseStorageDownloadTokens: uuid,
+      //       },
+      //     },
+      //   }
+      // );
+
+      const [signedUrl] = await blob.getSignedUrl(signedUrlConfig);
+      // const publicUrl = `https://storage.googleapis.com/v0/b/${
+      //   bucket.name
+      // }${encodeURIComponent(imageResponse[0].name)}?alt=media&token=${uuid}`;
+
+      const newNote = new noteModel({
+        // new keyword
+        title: title,
+        description: description,
+        userId: req.userId,
+        image: file && signedUrl,
+      });
+      await newNote.save();
+      res
+        .status(201)
+        .json({ message: "Note created successfull", data: { newNote } });
+    });
+    blobStream.end(file?.buffer);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: "Note creation failed" });
   }
 };
 
 const updateNote = async (req, res) => {
-  const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
-  const file = req.file;
-  const { title, description, done } = req.body;
-  const fileName = file?.filename;
-
-  console.log("req.body from UPDATE api BE", req.body);
-  const newNote = {
-    title: title,
-    description: description,
-    done: done,
-    userId: req.userId,
-    image: file && `${REACT_APP_BACKEND_URL}/note/image/${fileName}`,
-  };
-
   try {
-    await noteModel.findByIdAndUpdate(noteId, newNote, { new: true });
+    const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
+    const file = req.file;
+    const { title, description, done } = req.body;
+    const bucket = admin.storage().bucket("gs://prnotes-7c669.appspot.com");
+    const fileName = `${Date.now()}-${file?.originalname}`;
+    const blob = bucket.file(fileName);
+    const blobStream = blob.createWriteStream();
+    const note = await noteModel.findById(noteId);
 
-    res.status(200).json(newNote);
+    blobStream.on("error", (err) => {
+      console.log("Error while uploading image", err);
+      res.status(500).json({ error: "Image upload failed!" });
+    });
+    blobStream.on("finish", async () => {
+      const signedUrlConfig = {
+        action: "read",
+        // expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
+        expires: Date.now() + 315532800, // URL expires in 10 years {approx}
+      };
+
+      const [signedUrl] = await blob.getSignedUrl(signedUrlConfig);
+      const newNote = {
+        title: title,
+        description: description,
+        done: done,
+        userId: req.userId,
+        image: file ? signedUrl : note.image,
+      };
+
+      await noteModel.findByIdAndUpdate(noteId, newNote, { new: true });
+      res.status(200).json({ message: "Note is updated!", data: { newNote } });
+    });
+    blobStream.end(file?.buffer);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Something went wrong" });
