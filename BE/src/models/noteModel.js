@@ -19,7 +19,7 @@ const NoteSchema = mongoose.Schema(
       type: Boolean,
       required: false,
     },
-    image: {
+    attachment: {
       type: String,
       required: false,
     },

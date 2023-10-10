@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // const { REACT_APP_BACKEND_URL } = process.env;
-const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
-// const REACT_APP_BACKEND_URL = "http://localhost:5000";
+// const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
+const REACT_APP_BACKEND_URL = "http://localhost:5000";
 
 export const signUp = async (data: {
   first_name: string;
