@@ -39,9 +39,9 @@ const HomePage: FC<HomePageProps> = (props) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("description", data.description);
-    if (data.image) {
-      formData.append("image", data.image);
-    }
+    // if (data.image) {
+    formData.append("image", data.image);
+    // }
     createNote(formData, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);

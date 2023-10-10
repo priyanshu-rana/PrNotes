@@ -59,6 +59,20 @@ const createNote = async (req, res) => {
   }
 };
 
+// create new api as we accept attachment url insted of attachment
+const modifiedCreateNote = async (req, res) => {
+  try {
+    const { title, description, attachmentUrl } = req.body;
+    const newNote = noteModel({
+      title: title,
+      description: description,
+      attachment: attachmentUrl,
+      userId: req.userId,
+    });
+    await newNote.save();
+  } catch (error) {}
+};
+
 const updateNote = async (req, res) => {
   try {
     const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
