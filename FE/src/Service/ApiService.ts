@@ -1,4 +1,5 @@
 import axios from "axios";
+import { NoteType } from "../Component/CreateOrUpdateNoteModal";
 
 // const { REACT_APP_BACKEND_URL } = process.env;
 // const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
@@ -31,7 +32,7 @@ export const signIn = async (data: { email: string; password: string }) => {
   }
 };
 
-export const createNote = async (data: FormData, auth_token: string | null) => {
+export const createNote = async (data: NoteType, auth_token: string | null) => {
   await axios
     .post(`${REACT_APP_BACKEND_URL}/note`, data, {
       headers: {

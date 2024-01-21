@@ -8,7 +8,7 @@ import { v4 } from "uuid";
 export type NoteType = {
   title: string;
   description: string;
-  image?: File | null | string | any; //TODO replace any after MVP
+  attachmentUrl?: File | null | string | any; //TODO replace any after MVP
   done?: boolean;
 };
 
@@ -60,7 +60,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
         onSubmit={!noteDataForUpdate._id ? handleCreateNote : handleUpdateNote}
         initialValues={
           !noteDataForUpdate
-            ? { _id: "", title: "", description: "", image: "" }
+            ? { _id: "", title: "", description: "", attachmentUrl: "" }
             : {
                 title: noteDataForUpdate.title || "",
                 description: noteDataForUpdate.description || "",
@@ -116,7 +116,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                     (snapshot) =>
                       getDownloadURL(snapshot.ref).then((url) => {
                         // setAttachmentUrl(url);
-                        formProps.setFieldValue("image", url);
+                        formProps.setFieldValue("attachmentUrl", url);
                       })
                   );
                 }}
@@ -133,11 +133,11 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 <Input
                   name="image"
                   className="hidden"
-                  value={formProps.values.image}
+                  value={formProps.values.attachmentUrl}
                   // dangerouslySetInnerHTML={}
                   // onChange={() => formProps.setFieldValue("image", attachmentUrl)}
                 />
-                <img className="w-3/4" src={formProps.values.image} />{" "}
+                <img className="w-3/4" src={formProps.values.attachmentUrl} />
               </div>
             </div>
             <button
