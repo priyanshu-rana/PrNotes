@@ -11,6 +11,7 @@ const {
   getNotes,
   updateNote,
   deleteNote,
+  modifiedCreateNote,
 } = require("../controllers/noteController");
 
 const noteRouter = express.Router();
@@ -30,7 +31,7 @@ const upload = multer({
 const imageUpload = upload.single("image");
 
 // noteRouter.use("/image", express.static("./uploads"));
-noteRouter.post("/", auth, imageUpload, createNote);
+noteRouter.post("/", auth, modifiedCreateNote);
 noteRouter.get("/", auth, getNotes);
 noteRouter.put("/:noteId", auth, imageUpload, updateNote);
 noteRouter.delete("/:noteId", auth, deleteNote);

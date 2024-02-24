@@ -1,8 +1,7 @@
 import axios from "axios";
+import { NoteType } from "../Component/CreateOrUpdateNoteModal";
 
-// const { REACT_APP_BACKEND_URL } = process.env;
-const REACT_APP_BACKEND_URL = "https://notes-app-0hgc.onrender.com";
-// const REACT_APP_BACKEND_URL = "http://localhost:5000";
+const { VITE_REACT_APP_BACKEND_URL } = import.meta.env;
 
 export const signUp = async (data: {
   first_name: string;
@@ -11,7 +10,7 @@ export const signUp = async (data: {
   last_name?: string;
 }) => {
   await axios
-    .post(`${REACT_APP_BACKEND_URL}/user/signup`, { ...data })
+    .post(`${VITE_REACT_APP_BACKEND_URL}/user/signup`, { ...data })
     .then((res) => {
       console.log(res);
     })
@@ -21,7 +20,7 @@ export const signUp = async (data: {
 export const signIn = async (data: { email: string; password: string }) => {
   try {
     await axios
-      .post(`${REACT_APP_BACKEND_URL}/user/signin`, { ...data })
+      .post(`${VITE_REACT_APP_BACKEND_URL}/user/signin`, { ...data })
       .then((res) => {
         localStorage.setItem("login", res.data.token);
         console.log("sigin sucessful");
@@ -31,9 +30,9 @@ export const signIn = async (data: { email: string; password: string }) => {
   }
 };
 
-export const createNote = async (data: FormData, auth_token: string | null) => {
+export const createNote = async (data: NoteType, auth_token: string | null) => {
   await axios
-    .post(`${REACT_APP_BACKEND_URL}/note`, data, {
+    .post(`${VITE_REACT_APP_BACKEND_URL}/note`, data, {
       headers: {
         Authorization: auth_token,
         // "Content-Type": "multipart/form-data",
@@ -51,7 +50,7 @@ export const updateNote = async (
   auth_token: string | null
 ) => {
   try {
-    await axios.put(`${REACT_APP_BACKEND_URL}/note/${noteId}`, data, {
+    await axios.put(`${VITE_REACT_APP_BACKEND_URL}/note/${noteId}`, data, {
       headers: {
         Authorization: auth_token,
         // "Content-Type": "multipart/form-data",
@@ -64,7 +63,7 @@ export const updateNote = async (
 
 export const getNotes = async (auth_token?: string | null) => {
   try {
-    const response = await axios.get(`${REACT_APP_BACKEND_URL}/note`, {
+    const response = await axios.get(`${VITE_REACT_APP_BACKEND_URL}/note`, {
       headers: { Authorization: auth_token },
     });
     return response.data;
@@ -78,7 +77,7 @@ export const deleteNote = async (
   auth_token: string | null
 ) => {
   try {
-    await axios.delete(`${REACT_APP_BACKEND_URL}/note/${noteId}`, {
+    await axios.delete(`${VITE_REACT_APP_BACKEND_URL}/note/${noteId}`, {
       headers: { Authorization: auth_token },
     });
   } catch (error: any) {

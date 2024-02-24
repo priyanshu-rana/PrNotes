@@ -59,6 +59,26 @@ const createNote = async (req, res) => {
   }
 };
 
+// create new api as we accept attachment url insted of attachment
+const modifiedCreateNote = async (req, res) => {
+  try {
+    const { title, description, attachmentUrl } = req.body;
+    const newNote = noteModel({
+      title: title,
+      description: description,
+      attachmentUrl: attachmentUrl,
+      userId: req.userId,
+    });
+    await newNote.save();
+    res
+      .status(201)
+      .json({ message: "Note created successfull", data: { newNote } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Note creation failed" });
+  }
+};
+
 const updateNote = async (req, res) => {
   try {
     const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
@@ -69,7 +89,6 @@ const updateNote = async (req, res) => {
     const blob = bucket.file(fileName);
     const blobStream = blob.createWriteStream();
     const note = await noteModel.findById(noteId);
-
     blobStream.on("error", (err) => {
       console.log("Error while uploading image", err);
       res.status(500).json({ error: "Image upload failed!" });
@@ -125,4 +144,10 @@ const deleteNote = async (req, res) => {
   }
 };
 
-module.exports = { createNote, getNotes, updateNote, deleteNote };
+module.exports = {
+  createNote,
+  modifiedCreateNote,
+  getNotes,
+  updateNote,
+  deleteNote,
+};

@@ -24,7 +24,7 @@ const HomePage: FC<HomePageProps> = (props) => {
       title: string;
       description: string;
       done: boolean;
-      image: string;
+      attachmentUrl: string;
     }[]
   >([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -36,13 +36,7 @@ const HomePage: FC<HomePageProps> = (props) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const handleCreateNote = (data: NoteType) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    if (data.image) {
-      formData.append("image", data.image);
-    }
-    createNote(formData, localStorage.getItem("login"))
+    createNote(data, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note created successfully!");
@@ -55,8 +49,8 @@ const HomePage: FC<HomePageProps> = (props) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("description", data.description);
-    if (data.image) {
-      formData.append("image", data.image);
+    if (data.attachmentUrl) {
+      formData.append("attachment", data.attachmentUrl);
     }
 
     updateNote(noteDataForUpdate._id, formData, localStorage.getItem("login"))
@@ -170,7 +164,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                   </button>
                 </div>
               </div>
-              {n.image && (
+              {n.attachmentUrl && (
                 <Collapse
                   className="font-extrabold border-none bg-cyan-50"
                   items={[
@@ -178,7 +172,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                       label: "Attachment",
                       children: (
                         <div className="w-40">
-                          <Image src={n.image} />
+                          <Image src={n.attachmentUrl} />
                         </div>
                       ),
                     },
