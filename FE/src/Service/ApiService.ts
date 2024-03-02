@@ -46,7 +46,7 @@ export const createNote = async (data: NoteType, auth_token: string | null) => {
 
 export const updateNote = async (
   noteId: string | number,
-  data: FormData | boolean,
+  data: NoteType | { done: boolean },
   auth_token: string | null
 ) => {
   try {

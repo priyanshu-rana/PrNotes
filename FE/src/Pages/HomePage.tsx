@@ -46,14 +46,7 @@ const HomePage: FC<HomePageProps> = (props) => {
   };
 
   const handleUpdateNote = (data: NoteType) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    if (data.attachmentUrl) {
-      formData.append("attachment", data.attachmentUrl);
-    }
-
-    updateNote(noteDataForUpdate._id, formData, localStorage.getItem("login"))
+    updateNote(noteDataForUpdate._id, data, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note updated successfully!");
@@ -64,9 +57,7 @@ const HomePage: FC<HomePageProps> = (props) => {
   };
 
   const handleMarkNote = async (noteId: string, done: boolean) => {
-    const formData = new FormData();
-    formData.append("done", `${done}`);
-    await updateNote(noteId, formData, localStorage.getItem("login"))
+    await updateNote(noteId, { done: done }, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         setNoteDataForUpdate({ _id: "", description: "", title: "" });
@@ -121,7 +112,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                     className={n.done ? "text-green-400" : "text-red-400"}
                     onClick={() => {
                       setNoteDataForUpdate({ _id: n._id });
-                      handleMarkNote(n._id, !n.done ? true : false)
+                      handleMarkNote(n._id, !n.done)
                         .then(() =>
                           !n.done
                             ? toast.success(`Great, you have done: ${n.title}`)

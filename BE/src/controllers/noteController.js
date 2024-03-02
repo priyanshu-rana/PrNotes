@@ -130,9 +130,13 @@ const updateNote = async (req, res) => {
       attachmentUrl,
     };
     await noteModel.findByIdAndUpdate(noteId, updatedNote);
-    res.status(200).json({ message: "Note is updated!", data: { newNote } });
+    res
+      .status(200)
+      .json({ message: "Note is updated!", data: { updatedNote } });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
+    res
+      .status(500)
+      .json({ message: "Something went wrong", error: error.message });
   }
 };
 

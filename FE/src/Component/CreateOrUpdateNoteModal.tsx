@@ -19,7 +19,7 @@ type CreateOrUpdateNoteModalProps = {
     _id: string;
     title?: string;
     description?: string;
-    image?: any;
+    attachmentUrl?: string;
   };
   handleCreateNote: (data: NoteType) => void;
   handleUpdateNote: (data: NoteType) => void;
@@ -64,7 +64,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
             : {
                 title: noteDataForUpdate.title || "",
                 description: noteDataForUpdate.description || "",
-                // image: noteDataForUpdate.image || null,
+                attachmentUrl: noteDataForUpdate.attachmentUrl || null,
               }
         }
       >
