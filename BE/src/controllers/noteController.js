@@ -79,43 +79,60 @@ const createNote = async (req, res) => {
   }
 };
 
+// const updateNote = async (req, res) => {
+//   try {
+//     const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
+//     const file = req.file;
+//     const { title, description, done } = req.body;
+//     const bucket = admin.storage().bucket("gs://prnotes-7c669.appspot.com");
+//     const fileName = `${Date.now()}-${file?.originalname}`;
+//     const blob = bucket.file(fileName);
+//     const blobStream = blob.createWriteStream();
+//     const note = await noteModel.findById(noteId);
+//     blobStream.on("error", (err) => {
+//       console.log("Error while uploading image", err);
+//       res.status(500).json({ error: "Image upload failed!" });
+//     });
+//     blobStream.on("finish", async () => {
+//       const signedUrlConfig = {
+//         action: "read",
+//         // expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
+//         expires: Date.now() + 315532800, // URL expires in 10 years {approx}
+//       };
+
+//       const [signedUrl] = await blob.getSignedUrl(signedUrlConfig);
+//       const newNote = {
+//         title: title,
+//         description: description,
+//         done: done,
+//         userId: req.userId,
+//         image: file ? signedUrl : note.image,
+//       };
+
+//       await noteModel.findByIdAndUpdate(noteId, newNote, { new: true });
+//       res.status(200).json({ message: "Note is updated!", data: { newNote } });
+//     });
+//     blobStream.end(file?.buffer);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Something went wrong" });
+//   }
+// };
+
 const updateNote = async (req, res) => {
   try {
-    const noteId = req.params.noteId; //noteId is from paramas --> line.no 13 noteRoute
-    const file = req.file;
-    const { title, description, done } = req.body;
-    const bucket = admin.storage().bucket("gs://prnotes-7c669.appspot.com");
-    const fileName = `${Date.now()}-${file?.originalname}`;
-    const blob = bucket.file(fileName);
-    const blobStream = blob.createWriteStream();
-    const note = await noteModel.findById(noteId);
-    blobStream.on("error", (err) => {
-      console.log("Error while uploading image", err);
-      res.status(500).json({ error: "Image upload failed!" });
-    });
-    blobStream.on("finish", async () => {
-      const signedUrlConfig = {
-        action: "read",
-        // expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
-        expires: Date.now() + 315532800, // URL expires in 10 years {approx}
-      };
-
-      const [signedUrl] = await blob.getSignedUrl(signedUrlConfig);
-      const newNote = {
-        title: title,
-        description: description,
-        done: done,
-        userId: req.userId,
-        image: file ? signedUrl : note.image,
-      };
-
-      await noteModel.findByIdAndUpdate(noteId, newNote, { new: true });
-      res.status(200).json({ message: "Note is updated!", data: { newNote } });
-    });
-    blobStream.end(file?.buffer);
+    const noteId = req.params.noteId;
+    const { title, description, done, attachmentUrl } = req.body;
+    const updatedNote = {
+      title,
+      description,
+      done,
+      attachmentUrl,
+    };
+    await noteModel.findByIdAndUpdate(noteId, updatedNote);
+    res.status(200).json({ message: "Note is updated!", data: { newNote } });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: "Something went wrong", error });
   }
 };
 
@@ -142,7 +159,6 @@ const deleteNote = async (req, res) => {
 
 module.exports = {
   createNote,
-  modifiedCreateNote,
   getNotes,
   updateNote,
   deleteNote,
