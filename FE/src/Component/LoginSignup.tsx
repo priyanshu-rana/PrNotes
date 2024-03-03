@@ -5,6 +5,7 @@ import { signIn } from "../Service/ApiService";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { Button } from "antd";
+import PasswordInput from "./PasswordInput";
 
 type LoginSignupProps = {};
 
@@ -23,7 +24,7 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
   return !isSignupForm ? (
     <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-800 to-blue-900">
       {/*Can also use: via-green-800 */}
-      <div className="bg-white p-8 rounded shadow-lg">
+      <div className="bg-white min-w-360 p-8 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Login</h1>
         <ToastContainer />
         <Formik
@@ -41,23 +42,19 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
               .finally(() => setIsLoading(false));
           }}
         >
-          {(formprops) => (
-            <form className="flex flex-col" onSubmit={formprops.handleSubmit}>
+          {(formProps) => (
+            <form className="flex flex-col" onSubmit={formProps.handleSubmit}>
               <input
                 name="email"
-                value={formprops.values.email}
-                onChange={formprops.handleChange}
+                value={formProps.values.email}
+                onChange={formProps.handleChange}
                 type="text"
                 placeholder="Email"
                 className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800"
               />
-              <input
-                name="password"
-                value={formprops.values.password}
-                onChange={formprops.handleChange}
-                type="password"
-                placeholder="Password"
-                className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800"
+              <PasswordInput
+                value={formProps.values.password}
+                onChange={formProps.handleChange}
               />
               <Button
                 htmlType="submit"
@@ -70,12 +67,14 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
             </form>
           )}
         </Formik>
-        <div
-          className=" mt-4 flex cursor-pointer"
-          onClick={() => setIsSignupForm(true)}
-        >
-          Don't have an account ?
-          <span className="text-purple-600 ml-1">Sign up</span>
+        <div className="mt-4 flex">
+          <span>Don't have an account ?</span>
+          <button
+            className="text-purple-600 ml-1"
+            onClick={() => setIsSignupForm(true)}
+          >
+            Sign up
+          </button>
         </div>
       </div>
     </div>

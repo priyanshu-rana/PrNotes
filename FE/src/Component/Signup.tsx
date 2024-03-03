@@ -1,6 +1,7 @@
 import { Formik } from "formik";
 import { FC, memo } from "react";
 import { signUp } from "../Service/ApiService";
+import PasswordInput from "./PasswordInput";
 
 type SignupProps = {
   onClick: () => void;
@@ -15,7 +16,7 @@ const Signup: FC<SignupProps> = (props) => {
   };
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
-      <div className="bg-white p-8 rounded shadow-lg">
+      <div className="bg-white p-8 min-w-360 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Signup</h1>
         <Formik
           onSubmit={(values) => signUp(values)}
@@ -45,15 +46,11 @@ const Signup: FC<SignupProps> = (props) => {
                 onChange={formProps.handleChange}
                 type="text"
                 placeholder="Email"
-                className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800"
+                className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800 "
               />
-              <input
-                name="password"
+              <PasswordInput
                 value={formProps.values.password}
                 onChange={formProps.handleChange}
-                type="password"
-                placeholder="Password"
-                className="bg-gray-200 rounded py-2 px-4 mb-4 text-gray-800"
               />
               <button
                 type="submit"
@@ -65,9 +62,11 @@ const Signup: FC<SignupProps> = (props) => {
             </form>
           )}
         </Formik>
-        <div className="mt-4 flex cursor-pointer" onClick={props.onClick}>
-          Have an account ?{" "}
-          <span className="text-purple-600 ml-1"> Sign In</span>
+        <div className="mt-4 flex">
+          <span> Have an account ?</span>
+          <button className="text-purple-600 ml-1" onClick={props.onClick}>
+            Sign In
+          </button>
         </div>
       </div>
     </div>
