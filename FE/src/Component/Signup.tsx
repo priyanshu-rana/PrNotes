@@ -2,6 +2,7 @@ import { Formik } from "formik";
 import { FC, memo } from "react";
 import { signUp } from "../Service/ApiService";
 import PasswordInput from "./PasswordInput";
+import { toast } from "react-toastify";
 
 type SignupProps = {
   onClick: () => void;
@@ -14,12 +15,25 @@ const Signup: FC<SignupProps> = (props) => {
     email: "",
     password: "",
   };
+  const handleNavigateLogin = () => {
+    props.onClick();
+  };
+
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
       <div className="bg-white p-8 min-w-360 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Signup</h1>
         <Formik
-          onSubmit={(values) => signUp(values)}
+          onSubmit={(values) =>
+            signUp(values)
+              .then(() => {
+                handleNavigateLogin();
+                toast.success(
+                  "Account is Created!! You can login with your credentials"
+                );
+              })
+              .catch((e) => toast.error(e.response.data.message ?? e.message))
+          }
           initialValues={signupInitialValues}
         >
           {(formProps) => (
@@ -64,7 +78,10 @@ const Signup: FC<SignupProps> = (props) => {
         </Formik>
         <div className="mt-4 flex">
           <span> Have an account ?</span>
-          <button className="text-purple-600 ml-1" onClick={props.onClick}>
+          <button
+            className="text-purple-600 ml-1"
+            onClick={handleNavigateLogin}
+          >
             Sign In
           </button>
         </div>

@@ -14,7 +14,9 @@ export const signUp = async (data: {
     .then((res) => {
       console.log(res);
     })
-    .catch((e) => alert(e.response.data.message));
+    .catch((e) => {
+      throw e;
+    });
 };
 
 export const signIn = async (data: { email: string; password: string }) => {

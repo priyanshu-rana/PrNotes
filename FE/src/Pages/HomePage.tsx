@@ -87,9 +87,15 @@ const HomePage: FC<HomePageProps> = (props) => {
           + Add Note
         </button>
       </div>
-      {!!notes.length && isLoaded ? (
+      {isLoaded ? (
         // <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
         <div className="space-y-2 lg:w-1/2">
+          {!notes.length && (
+            <h1 className="text-white  text-xl">
+              Hey !! Create notes by clicking on
+              <span className="font-bold"> `+Add Note`</span> button ..
+            </h1>
+          )}
           {notes.map((n, i) => (
             <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
               <div
@@ -182,7 +188,6 @@ const HomePage: FC<HomePageProps> = (props) => {
           Loading
         </Button>
       )}
-      <ToastContainer />
       <CreateOrUpdateNoteModal
         open={isModalVisible}
         handleCreateNote={handleCreateNote}
@@ -196,7 +201,5 @@ const HomePage: FC<HomePageProps> = (props) => {
     </div>
   );
 };
-
-HomePage.defaultProps = {};
 
 export default HomePage;

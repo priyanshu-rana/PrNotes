@@ -3,7 +3,7 @@ import Signup from "./Signup";
 import { Formik } from "formik";
 import { signIn } from "../Service/ApiService";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Button } from "antd";
 import PasswordInput from "./PasswordInput";
 
@@ -26,13 +26,13 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
       {/*Can also use: via-green-800 */}
       <div className="bg-white min-w-360 p-8 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Login</h1>
-        <ToastContainer />
         <Formik
           initialValues={{ email: "", password: "" }}
           onSubmit={(values) => {
             setIsLoading(true);
             signIn(values)
               .then(() => {
+                toast.success("Login Successful !!");
                 navigate("/");
               })
               .catch((e) => {
