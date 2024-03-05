@@ -90,9 +90,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
             </div>
 
             <div>
-              {/* <Upload>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload> */}
               <label htmlFor="Attachment">Attachment</label>
               <Input
                 type="file"
@@ -134,8 +131,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   name="image"
                   className="hidden"
                   value={formProps.values.attachmentUrl}
-                  // dangerouslySetInnerHTML={}
-                  // onChange={() => formProps.setFieldValue("image", attachmentUrl)}
                 />
                 <img className="w-3/4" src={formProps.values.attachmentUrl} />
               </div>
