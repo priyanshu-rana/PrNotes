@@ -35,7 +35,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
 
-  // const attachmentRef = ref(storage, "attachments/");
   const attachmentUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const files = target.files![0];
@@ -46,7 +45,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       getDownloadURL(snapshot.ref).then((url) => setAttachmentUrl(url))
     );
   };
-  // console.log("attachmentUrl", attachmentUrl);
   return (
     <Modal
       open={open}
@@ -93,18 +91,8 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
               <label htmlFor="Attachment">Attachment</label>
               <Input
                 type="file"
-                // value={formProps.values.image}
-                // onChange={(e) => {
-                //   const file = e.currentTarget.files
-                //     ? e.currentTarget.files[0]
-                //     : null;
-
-                //   console.log("e.currentTarget.files", file);
-                //   formProps.setFieldValue("image", file);
-                // }}
-                // value={attachmentUrl}
                 onChange={(e: any) => {
-                  // Add modal for confermation of file upload (e.g. wether you wanna upload this attachment??)
+                  // TODO: Add modal for confirmation of file upload (e.g. wether you wanna upload this attachment??)
                   const attachmentRef = ref(
                     storage,
                     `attachments/${e.target.files[0].name + v4()}`
@@ -120,6 +108,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 suffix={
                   <Button
                     className="hover:text-red-500"
+                    // TODO: On this button click remove Uploaded File from Firebase Storage and the AttachmentUrl from Database
                     // onClick={() => formProps.setFieldValue("image", null)}
                   >
                     X
