@@ -111,7 +111,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                     <h1>{i + 1}.</h1>
                     <h1>{n.title}</h1>
                   </div>
-                  <h1>{n.description}</h1>
+                  <h1 className="break-all">{n.description}</h1>
                 </div>
                 <div className="flex space-x-4">
                   <button
