@@ -23,6 +23,13 @@ const NoteSchema = mongoose.Schema(
       type: String,
       required: false,
     },
+    tagIds: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Tag",
+        required: false,
+      },
+    ],
   },
   { timestamps: true }
 );

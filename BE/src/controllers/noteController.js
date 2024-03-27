@@ -3,12 +3,13 @@ const noteModel = require("../models/noteModel");
 
 const createNote = async (req, res) => {
   try {
-    const { title, description, attachmentUrl } = req.body;
+    const { title, description, attachmentUrl, tagIds } = req.body;
     const newNote = noteModel({
       title: title,
       description: description,
       attachmentUrl: attachmentUrl,
       userId: req.userId,
+      tagIds: tagIds,
     });
     await newNote.save();
     res
@@ -23,12 +24,13 @@ const createNote = async (req, res) => {
 const updateNote = async (req, res) => {
   try {
     const noteId = req.params.noteId;
-    const { title, description, done, attachmentUrl } = req.body;
+    const { title, description, done, attachmentUrl, tagIds } = req.body;
     const updatedNote = {
       title,
       description,
       done,
       attachmentUrl,
+      tagIds,
     };
     await noteModel.findByIdAndUpdate(noteId, updatedNote);
     res
