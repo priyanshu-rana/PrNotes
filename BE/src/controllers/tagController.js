@@ -1,5 +1,19 @@
 const tagModel = require("../models/tagModel");
 
+const getTagList = async (req, res) => {
+  const userId = req.userId;
+  try {
+    const tags = await tagModel.find({ creatorId: userId });
+    res.status(200).json(tags);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: error.message,
+      message: "Something went wrong, Unable to fetch Tags !",
+    });
+  }
+};
+
 const createTag = async (req, res) => {
   try {
     const { title } = req.body;
@@ -35,4 +49,5 @@ const deleteTag = async (req, res) => {
 module.exports = {
   createTag,
   deleteTag,
+  getTagList,
 };
