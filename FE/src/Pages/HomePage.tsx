@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   createNote,
   deleteNote,
   getNotes,
+  getTagList,
   updateNote,
 } from "../Service/ApiService";
 import { Button, Collapse, Image } from "antd";
@@ -34,6 +35,7 @@ const HomePage: FC<HomePageProps> = (props) => {
     description?: string;
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [tagList, setTagList] = useState<{ _id: string; title: string }[]>();
 
   const handleCreateNote = (data: NoteType) => {
     createNote(data, localStorage.getItem("login"))
@@ -72,6 +74,7 @@ const HomePage: FC<HomePageProps> = (props) => {
         setNotes(notes);
         setIsLoaded(true);
       });
+      getTagList(login).then((tag) => setTagList(tag));
     }
   }, [isLoaded]);
 
@@ -197,6 +200,7 @@ const HomePage: FC<HomePageProps> = (props) => {
           setIsModalVisible(false);
           setNoteDataForUpdate({ _id: "", title: "", description: "" });
         }}
+        tagList={tagList}
       />
     </div>
   );

@@ -86,3 +86,14 @@ export const deleteNote = async (
     throw new Error("Unable to delete Note!", error);
   }
 };
+
+export const getTagList = async (auth_token: string | null) => {
+  try {
+    const response = await axios.get(`${VITE_REACT_APP_BACKEND_URL}/tag/list`, {
+      headers: { Authorization: auth_token },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Unable to get tag list");
+  }
+};

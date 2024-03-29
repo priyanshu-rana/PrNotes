@@ -10,6 +10,7 @@ export type NoteType = {
   description: string;
   attachmentUrl?: File | null | string | any; //TODO replace any after MVP
   done?: boolean;
+  tagIds?: [];
 };
 
 type CreateOrUpdateNoteModalProps = {
@@ -20,9 +21,11 @@ type CreateOrUpdateNoteModalProps = {
     title?: string;
     description?: string;
     attachmentUrl?: string;
+    tagIds?: [];
   };
   handleCreateNote: (data: NoteType) => void;
   handleUpdateNote: (data: NoteType) => void;
+  tagList?: { _id: string; title: string }[];
 };
 
 const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
@@ -31,9 +34,11 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   handleCreateNote,
   handleUpdateNote,
   noteDataForUpdate,
+  tagList,
 }) => {
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const attachmentUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -58,11 +63,18 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
         onSubmit={!noteDataForUpdate._id ? handleCreateNote : handleUpdateNote}
         initialValues={
           !noteDataForUpdate
-            ? { _id: "", title: "", description: "", attachmentUrl: "" }
+            ? {
+                _id: "",
+                title: "",
+                description: "",
+                attachmentUrl: "",
+                tagIds: [],
+              }
             : {
                 title: noteDataForUpdate.title || "",
                 description: noteDataForUpdate.description || "",
-                attachmentUrl: noteDataForUpdate.attachmentUrl || null,
+                attachmentUrl: noteDataForUpdate.attachmentUrl || "",
+                tagIds: noteDataForUpdate.tagIds || [],
               }
         }
       >
@@ -123,6 +135,31 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 />
                 <img className="w-3/4" src={formProps.values.attachmentUrl} />
               </div>
+            </div>
+            <div className="space-x-2">
+              {tagList?.map((tag) => (
+                <button
+                  className={`${
+                    selectedTagIds.includes(tag._id)
+                      ? "bg-blue-600"
+                      : "bg-gray-400"
+                  } text-white rounded-full py-1 px-2`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTagIds(
+                      selectedTagIds.includes(tag._id)
+                        ? selectedTagIds.filter((t) => t !== tag._id) //Check whether tag already present in the list, if yes then removes that tag
+                        : [...selectedTagIds, tag._id]
+                    );
+                    // const tagIds = formProps.values.tagIds?.includes(tag._id)
+                    //   ? formProps.values.tagIds.filter((t) => t !== tag._id)
+                    //   : [...formProps.values.tagIds, tag._id];
+                    // formProps.setFieldValue("tagIds", tagIds);
+                  }}
+                >
+                  {tag.title}
+                </button>
+              ))}
             </div>
             <button
               className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"
