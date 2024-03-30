@@ -151,10 +151,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                         ? selectedTagIds.filter((t) => t !== tag._id) //Check whether tag already present in the list, if yes then removes that tag
                         : [...selectedTagIds, tag._id]
                     );
-                    // const tagIds = formProps.values.tagIds?.includes(tag._id)
-                    //   ? formProps.values.tagIds.filter((t) => t !== tag._id)
-                    //   : [...formProps.values.tagIds, tag._id];
-                    // formProps.setFieldValue("tagIds", tagIds);
                   }}
                 >
                   {tag.title}
