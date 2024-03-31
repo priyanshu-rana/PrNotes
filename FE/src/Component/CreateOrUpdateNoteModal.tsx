@@ -1,6 +1,6 @@
 import { Button, Input, Modal, Upload } from "antd";
 import { Formik } from "formik";
-import { FC, InputHTMLAttributes, memo, useState } from "react";
+import { FC, InputHTMLAttributes, memo, useEffect, useState } from "react";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
@@ -10,7 +10,7 @@ export type NoteType = {
   description: string;
   attachmentUrl?: File | null | string | any; //TODO replace any after MVP
   done?: boolean;
-  tagIds?: [];
+  tagIds?: string[];
 };
 
 type CreateOrUpdateNoteModalProps = {
@@ -21,7 +21,7 @@ type CreateOrUpdateNoteModalProps = {
     title?: string;
     description?: string;
     attachmentUrl?: string;
-    tagIds?: [];
+    tagIds?: string[];
   };
   handleCreateNote: (data: NoteType) => void;
   handleUpdateNote: (data: NoteType) => void;
@@ -50,6 +50,13 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       getDownloadURL(snapshot.ref).then((url) => setAttachmentUrl(url))
     );
   };
+
+  useEffect(() => {
+    if (noteDataForUpdate.tagIds) {
+      setSelectedTagIds(noteDataForUpdate.tagIds);
+    }
+  }, [noteDataForUpdate.tagIds]);
+
   return (
     <Modal
       open={open}
@@ -60,7 +67,18 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       destroyOnClose
     >
       <Formik
-        onSubmit={!noteDataForUpdate._id ? handleCreateNote : handleUpdateNote}
+        onSubmit={(values) => {
+          const noteData: NoteType = {
+            title: values.title,
+            description: values.description,
+            attachmentUrl: values.attachmentUrl,
+            tagIds: selectedTagIds,
+          };
+
+          !noteDataForUpdate._id
+            ? handleCreateNote(noteData)
+            : handleUpdateNote(noteData);
+        }}
         initialValues={
           !noteDataForUpdate
             ? {

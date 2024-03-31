@@ -65,9 +65,12 @@ export const updateNote = async (
 
 export const getNotes = async (auth_token?: string | null) => {
   try {
-    const response = await axios.get(`${VITE_REACT_APP_BACKEND_URL}/note`, {
-      headers: { Authorization: auth_token },
-    });
+    const response = await axios.get(
+      `${VITE_REACT_APP_BACKEND_URL}/note/note-list`,
+      {
+        headers: { Authorization: auth_token },
+      }
+    );
     return response.data;
   } catch (error: any) {
     throw new Error("Error fetching data from the API!", error);
@@ -89,9 +92,12 @@ export const deleteNote = async (
 
 export const getTagList = async (auth_token: string | null) => {
   try {
-    const response = await axios.get(`${VITE_REACT_APP_BACKEND_URL}/tag/list`, {
-      headers: { Authorization: auth_token },
-    });
+    const response = await axios.get(
+      `${VITE_REACT_APP_BACKEND_URL}/tag/tag-list`,
+      {
+        headers: { Authorization: auth_token },
+      }
+    );
     return response.data;
   } catch (error) {
     throw new Error("Unable to get tag list");

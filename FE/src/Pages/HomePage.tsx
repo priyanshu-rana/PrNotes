@@ -70,10 +70,17 @@ const HomePage: FC<HomePageProps> = (props) => {
   useEffect(() => {
     const login = localStorage.getItem("login");
     if (!isLoaded) {
-      getNotes(login).then((notes) => {
-        setNotes(notes);
-        setIsLoaded(true);
-      });
+      getNotes(login)
+        .then((notes) => {
+          setNotes(notes);
+          setIsLoaded(true);
+        })
+        .catch((error) => {
+          console.log(error);
+          setNotes(undefined as any); // for handling error due to api fail
+          setIsLoaded(true);
+        });
+
       getTagList(login).then((tag) => setTagList(tag));
     }
   }, [isLoaded]);
@@ -84,7 +91,8 @@ const HomePage: FC<HomePageProps> = (props) => {
       <Header />
       <div className="py-10 flex space-x-4">
         <button
-          className="py-2 px-10 rounded-lg bg-white text-gray-800 font-semibold hover:scale-110 hover:ease-in-out"
+          disabled={notes === undefined}
+          className="py-2 px-10 rounded-lg bg-white text-gray-800 font-semibold hover:scale-110 hover:ease-in-out disabled:scale-100 disabled:bg-gray-400 disabled:cursor-not-allowed"
           onClick={() => setIsModalVisible(true)}
         >
           + Add Note
@@ -93,94 +101,110 @@ const HomePage: FC<HomePageProps> = (props) => {
       {isLoaded ? (
         // <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
         <div className="space-y-2 lg:w-1/2">
-          {!notes.length && (
+          {notes ? (
+            notes.length === 0 && (
+              <h1 className="text-white  text-xl">
+                Hey !! Create notes by clicking on
+                <span className="font-bold"> `+Add Note`</span> button ..
+              </h1>
+            )
+          ) : (
             <h1 className="text-white  text-xl">
-              Hey !! Create notes by clicking on
-              <span className="font-bold"> `+Add Note`</span> button ..
+              Unable to get Notes,
+              <span className="font-bold"> `Try again`</span> or{" "}
+              <a
+                className="font-bold text-blue-200 text-2xl cursor-pointer"
+                href={`mailto:${import.meta.env.VITE_SUPPORT_EMAIL}`}
+              >
+                `Contact Us`
+              </a>
             </h1>
           )}
-          {notes.map((n, i) => (
-            <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
-              <div
-                className={`text-white p-4 space-x-1 flex items-center justify-between
-              }`}
-              >
+          {notes &&
+            notes.map((n, i) => (
+              <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
                 <div
-                  className={`${
-                    n.done ? "line-through text-green-300" : ""
-                  } md:w-4/5`}
+                  className={`text-white p-4 space-x-1 flex items-center justify-between
+              }`}
                 >
-                  <div className="flex font-bold">
-                    <h1>{i + 1}.</h1>
-                    <h1>{n.title}</h1>
+                  <div
+                    className={`${
+                      n.done ? "line-through text-green-300" : ""
+                    } md:w-4/5`}
+                  >
+                    <div className="flex font-bold">
+                      <h1>{i + 1}.</h1>
+                      <h1>{n.title}</h1>
+                    </div>
+                    <h1 className="break-all">{n.description}</h1>
                   </div>
-                  <h1 className="break-all">{n.description}</h1>
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    className={n.done ? "text-green-400" : "text-red-400"}
-                    onClick={() => {
-                      setNoteDataForUpdate({ _id: n._id });
-                      handleMarkNote(n._id, !n.done)
-                        .then(() =>
-                          !n.done
-                            ? toast.success(`Great, you have done: ${n.title}`)
-                            : toast.success(
-                                `Opps, removed ' ${n.title} ' from done`
-                              )
-                        )
-                        .catch((e) => console.log(e));
-                    }}
-                  >
-                    {n.done ? (
-                      <MdRemoveDone size={25} />
-                    ) : (
-                      <MdDoneAll size={25} />
-                    )}
-                  </button>
-                  <button
-                    className="text-blue-200 font-extrabold"
-                    onClick={() => {
-                      setNoteDataForUpdate(n);
-                      setIsModalVisible(true);
-                    }}
-                  >
-                    <FaEdit size={25} />
-                  </button>
-                  <button
-                    className="text-red-500 font-extrabold"
-                    onClick={() => {
-                      deleteNote(n._id, localStorage.getItem("login"))
-                        .then(() => {
-                          setIsLoaded(false);
-                          toast.success("Note is deleted sucessfully!!");
-                        })
-                        .catch((e) => console.log(e));
+                  <div className="flex space-x-4">
+                    <button
+                      className={n.done ? "text-green-400" : "text-red-400"}
+                      onClick={() => {
+                        setNoteDataForUpdate({ _id: n._id });
+                        handleMarkNote(n._id, !n.done)
+                          .then(() =>
+                            !n.done
+                              ? toast.success(
+                                  `Great, you have done: ${n.title}`
+                                )
+                              : toast.success(
+                                  `Opps, removed ' ${n.title} ' from done`
+                                )
+                          )
+                          .catch((e) => console.log(e));
+                      }}
+                    >
+                      {n.done ? (
+                        <MdRemoveDone size={25} />
+                      ) : (
+                        <MdDoneAll size={25} />
+                      )}
+                    </button>
+                    <button
+                      className="text-blue-200 font-extrabold"
+                      onClick={() => {
+                        setNoteDataForUpdate(n);
+                        setIsModalVisible(true);
+                      }}
+                    >
+                      <FaEdit size={25} />
+                    </button>
+                    <button
+                      className="text-red-500 font-extrabold"
+                      onClick={() => {
+                        deleteNote(n._id, localStorage.getItem("login"))
+                          .then(() => {
+                            setIsLoaded(false);
+                            toast.success("Note is deleted sucessfully!!");
+                          })
+                          .catch((e) => console.log(e));
 
-                      // setNotes([...notes].filter((note) => note._id !== n._id));
-                    }}
-                  >
-                    <RiDeleteBinLine size={25} />
-                  </button>
+                        // setNotes([...notes].filter((note) => note._id !== n._id));
+                      }}
+                    >
+                      <RiDeleteBinLine size={25} />
+                    </button>
+                  </div>
                 </div>
+                {n.attachmentUrl && (
+                  <Collapse
+                    className="font-extrabold border-none bg-cyan-50"
+                    items={[
+                      {
+                        label: "Attachment",
+                        children: (
+                          <div className="w-40">
+                            <Image src={n.attachmentUrl} />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                )}
               </div>
-              {n.attachmentUrl && (
-                <Collapse
-                  className="font-extrabold border-none bg-cyan-50"
-                  items={[
-                    {
-                      label: "Attachment",
-                      children: (
-                        <div className="w-40">
-                          <Image src={n.attachmentUrl} />
-                        </div>
-                      ),
-                    },
-                  ]}
-                />
-              )}
-            </div>
-          ))}
+            ))}
         </div>
       ) : (
         <Button

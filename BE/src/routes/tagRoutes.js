@@ -9,7 +9,7 @@ const {
 const tagRouter = express.Router();
 
 tagRouter.post("/", auth, createTag);
-tagRouter.get("/list", auth, getTagList);
+tagRouter.get("/tag-list", auth, getTagList);
 tagRouter.delete("/:tagId", auth, deleteTag);
 
 module.exports = tagRouter;
