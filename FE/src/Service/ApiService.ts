@@ -106,13 +106,9 @@ export const getTagList = async (auth_token: string | null) => {
 
 export const createTag = async (data: any, auth_token: string | null) => {
   try {
-    axios.post(
-      `${VITE_REACT_APP_BACKEND_URL}/tag/`,
-      { title: data },
-      {
-        headers: { Authorization: auth_token },
-      }
-    );
+    axios.post(`${VITE_REACT_APP_BACKEND_URL}/tag/`, data, {
+      headers: { Authorization: auth_token },
+    });
   } catch (error) {
     console.log(error);
     throw new Error("Unable to create tag");

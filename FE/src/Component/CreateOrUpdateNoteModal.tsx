@@ -1,6 +1,13 @@
-import { Button, Input, Modal, Upload } from "antd";
+import { Button, Input, InputRef, Modal, Upload } from "antd";
 import { Formik } from "formik";
-import { FC, InputHTMLAttributes, memo, useEffect, useState } from "react";
+import {
+  FC,
+  InputHTMLAttributes,
+  memo,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
@@ -25,6 +32,7 @@ type CreateOrUpdateNoteModalProps = {
   };
   handleCreateNote: (data: NoteType) => void;
   handleUpdateNote: (data: NoteType) => void;
+  handleCreateTag: (data: { title: string }) => void;
   tagList?: { _id: string; title: string }[];
 };
 
@@ -35,6 +43,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   handleUpdateNote,
   noteDataForUpdate,
   tagList,
+  handleCreateTag,
 }) => {
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
@@ -174,6 +183,25 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   {tag.title}
                 </button>
               ))}
+              <div>
+                <label htmlFor="Description">Tags</label>
+                <Input
+                  placeholder="Create Tag here by typing and clicking or pressing enter"
+                  // onChange={formProps.handleChange}
+                  className="hover:cursor-pointer"
+                  onClick={(tag) => {
+                    tag.currentTarget.value.trim() !== "" &&
+                      handleCreateTag({ title: tag.currentTarget.value });
+                    // tagInputRef.current.value = ""; //TODO: Clear Input after creating
+                  }}
+                  // onKeyPress={(tag) => {
+                  //   if (tag.key === "Enter") {
+                  //     handleCreateTag(tag.target.value);
+                  //     return;
+                  //   }
+                  // }}
+                />
+              </div>
             </div>
             <button
               className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"

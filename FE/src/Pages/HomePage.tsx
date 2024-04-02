@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   createNote,
+  createTag,
   deleteNote,
   getNotes,
   getTagList,
@@ -67,6 +68,12 @@ const HomePage: FC<HomePageProps> = (props) => {
       .catch((e) => toast.error(e));
   };
 
+  const handleCreateTag = (data: any) => {
+    createTag(data, localStorage.getItem("login")).then(() =>
+      setIsLoaded(false)
+    );
+  };
+
   useEffect(() => {
     const login = localStorage.getItem("login");
     if (!isLoaded) {
@@ -81,7 +88,13 @@ const HomePage: FC<HomePageProps> = (props) => {
           setIsLoaded(true);
         });
 
-      getTagList(login).then((tag) => setTagList(tag));
+      getTagList(login)
+        .then((tag) => setTagList(tag))
+        .then(() => setIsLoaded(true))
+        .catch((e) => {
+          toast.error(e);
+          setIsLoaded(true);
+        });
     }
   }, [isLoaded]);
 
@@ -219,6 +232,7 @@ const HomePage: FC<HomePageProps> = (props) => {
         open={isModalVisible}
         handleCreateNote={handleCreateNote}
         handleUpdateNote={handleUpdateNote}
+        handleCreateTag={handleCreateTag}
         noteDataForUpdate={noteDataForUpdate}
         onCancel={() => {
           setIsModalVisible(false);
