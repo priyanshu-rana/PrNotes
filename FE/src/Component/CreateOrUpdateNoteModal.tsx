@@ -48,6 +48,8 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [tagName, setTagName] = useState("");
+  const trimmedTagName = tagName.trim();
 
   const attachmentUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -163,7 +165,31 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 <img className="w-3/4" src={formProps.values.attachmentUrl} />
               </div>
             </div>
-            <div className="space-x-2">
+            <div>
+              <label htmlFor="Description">Tags</label>
+              <Input
+                value={tagName}
+                placeholder="Create Tag here by typing and clicking or pressing enter"
+                onChange={(tag) => setTagName(tag.target.value)}
+                className={
+                  tagName.trim() !== "" ? `cursor-pointer` : "cursor-auto"
+                }
+                onClick={() => {
+                  trimmedTagName !== "" &&
+                    handleCreateTag({ title: trimmedTagName });
+                  setTagName("");
+                }}
+                onKeyPress={(tag) => {
+                  if (trimmedTagName !== "" && tag.key === "Enter") {
+                    tag.preventDefault();
+                    handleCreateTag({ title: trimmedTagName });
+                    return;
+                  }
+                }}
+              />
+            </div>
+
+            <div className="space-x-2 space-y-1">
               {tagList?.map((tag) => (
                 <button
                   className={`${
@@ -183,25 +209,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   {tag.title}
                 </button>
               ))}
-              <div>
-                <label htmlFor="Description">Tags</label>
-                <Input
-                  placeholder="Create Tag here by typing and clicking or pressing enter"
-                  // onChange={formProps.handleChange}
-                  className="hover:cursor-pointer"
-                  onClick={(tag) => {
-                    tag.currentTarget.value.trim() !== "" &&
-                      handleCreateTag({ title: tag.currentTarget.value });
-                    // tagInputRef.current.value = ""; //TODO: Clear Input after creating
-                  }}
-                  // onKeyPress={(tag) => {
-                  //   if (tag.key === "Enter") {
-                  //     handleCreateTag(tag.target.value);
-                  //     return;
-                  //   }
-                  // }}
-                />
-              </div>
             </div>
             <button
               className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"
