@@ -11,6 +11,7 @@ import {
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export type NoteType = {
   title: string;
@@ -209,6 +210,17 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   {tag.title}
                 </button>
               ))}
+              {tagList?.length && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="flex items-center space-x-2 bg-red-500 rounded-full px-2 py-1 text-white text-xs font-bold"
+                  >
+                    <RiDeleteBinLine size={16} />
+                    <h1>Delete Tag</h1>
+                  </button>
+                </div>
+              )}
             </div>
             <button
               className="text-xl bg-gray-700 text-white border border-white rounded-xl px-4 hover:scale-105"
