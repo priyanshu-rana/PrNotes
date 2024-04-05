@@ -34,6 +34,8 @@ const HomePage: FC<HomePageProps> = (props) => {
     _id: string;
     title?: string;
     description?: string;
+    attachmentUrl?: string;
+    tagIds?: [];
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
   const [tagList, setTagList] = useState<{ _id: string; title: string }[]>();
@@ -236,7 +238,13 @@ const HomePage: FC<HomePageProps> = (props) => {
         noteDataForUpdate={noteDataForUpdate}
         onCancel={() => {
           setIsModalVisible(false);
-          setNoteDataForUpdate({ _id: "", title: "", description: "" });
+          setNoteDataForUpdate({
+            _id: "",
+            title: "",
+            description: "",
+            attachmentUrl: "",
+            tagIds: [],
+          });
         }}
         tagList={tagList}
       />
