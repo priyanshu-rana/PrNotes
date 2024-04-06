@@ -1,17 +1,11 @@
-import { Button, Input, InputRef, Modal, Upload } from "antd";
+import { Button, Input, Modal } from "antd";
 import { Formik } from "formik";
-import {
-  FC,
-  InputHTMLAttributes,
-  memo,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import { RiDeleteBinLine } from "react-icons/ri";
+import TextArea from "antd/es/input/TextArea";
 
 export type NoteType = {
   title: string;
@@ -121,7 +115,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
             </div>
             <div>
               <label htmlFor="Description">Description</label>
-              <Input
+              <TextArea
                 name="description"
                 placeholder="Enter Description here"
                 value={formProps.values.description}
