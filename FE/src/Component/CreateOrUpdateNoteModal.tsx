@@ -178,6 +178,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   if (trimmedTagName !== "" && tag.key === "Enter") {
                     tag.preventDefault();
                     handleCreateTag({ title: trimmedTagName });
+                    setTagName("");
                     return;
                   }
                 }}

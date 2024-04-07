@@ -27,6 +27,7 @@ const HomePage: FC<HomePageProps> = (props) => {
       description: string;
       done: boolean;
       attachmentUrl: string;
+      tagIds: [];
     }[]
   >([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -39,6 +40,18 @@ const HomePage: FC<HomePageProps> = (props) => {
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
   const [tagList, setTagList] = useState<{ _id: string; title: string }[]>();
+  const [selectedTag, setSelectedTag] = useState<string[]>([]);
+  const [activeTags, setActiveTags] = useState<
+    {
+      _id: string;
+      title: string;
+    }[]
+  >();
+
+  const filterdNotes = notes.filter((note) => {
+    if (selectedTag.length == 0) return true;
+    return note.tagIds.some((tagId) => selectedTag.includes(tagId));
+  });
 
   const handleCreateNote = (data: NoteType) => {
     createNote(data, localStorage.getItem("login"))
@@ -76,6 +89,14 @@ const HomePage: FC<HomePageProps> = (props) => {
     );
   };
 
+  const handleTagClick = (tagId: string) => {
+    if (selectedTag.includes(tagId)) {
+      setSelectedTag(selectedTag.filter((t) => t !== tagId));
+    } else {
+      setSelectedTag([...selectedTag, tagId]);
+    }
+  };
+
   useEffect(() => {
     const login = localStorage.getItem("login");
     if (!isLoaded) {
@@ -100,11 +121,28 @@ const HomePage: FC<HomePageProps> = (props) => {
     }
   }, [isLoaded]);
 
+  useEffect(() => {
+    const allActiveTagIds: string[] = notes.reduce((acc, note) => {
+      note.tagIds.forEach((tagId) => {
+        if (!acc.includes(tagId)) {
+          acc.push(tagId);
+        }
+      });
+      return acc;
+    }, []);
+
+    const activeTagsFromIds = tagList?.filter((tag) => {
+      return allActiveTagIds.includes(tag._id);
+    });
+
+    setActiveTags(activeTagsFromIds);
+  }, [notes]);
+
   return (
     // <div className="min-h-screen p-10 bg-gradient-to-br from-red-500 via-lime-400 to-blue-500">
     <div className="min-h-screen p-4 md:p-10  bg-gradient-to-r from-gray-800 to-blue-900 ">
       <Header />
-      <div className="py-10 flex space-x-4">
+      <div className="py-10 space-y-8">
         <button
           disabled={notes === undefined}
           className="py-2 px-10 rounded-lg bg-white text-gray-800 font-semibold hover:scale-110 hover:ease-in-out disabled:scale-100 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -112,6 +150,19 @@ const HomePage: FC<HomePageProps> = (props) => {
         >
           + Add Note
         </button>
+        <div className="flex space-x-2">
+          {activeTags?.map((tag) => (
+            <button
+              className={`bg-white rounded-full px-2 py-1 ${
+                selectedTag.includes(tag._id) &&
+                "bg-lime-400 text-blue-800 font-semibold "
+              }`}
+              onClick={() => handleTagClick(tag._id)}
+            >
+              {tag.title}
+            </button>
+          ))}
+        </div>
       </div>
       {isLoaded ? (
         // <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
@@ -135,8 +186,8 @@ const HomePage: FC<HomePageProps> = (props) => {
               </a>
             </h1>
           )}
-          {notes &&
-            notes.map((n, i) => (
+          {filterdNotes &&
+            filterdNotes.map((n, i) => (
               <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
                 <div
                   className={`text-white p-4 space-x-1 flex items-center justify-between
