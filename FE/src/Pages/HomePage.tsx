@@ -155,7 +155,7 @@ const HomePage: FC<HomePageProps> = (props) => {
             <button
               className={`bg-white rounded-full px-2 py-1 ${
                 selectedTag.includes(tag._id) &&
-                "bg-lime-400 text-blue-800 font-semibold "
+                "bg-green-400 font-semibold text-blue-700"
               }`}
               onClick={() => handleTagClick(tag._id)}
             >
