@@ -83,7 +83,7 @@ const HomePage: FC<HomePageProps> = (props) => {
       .catch((e) => toast.error(e));
   };
 
-  const handleCreateTag = (data: any) => {
+  const handleCreateTag = (data: { title: string }) => {
     createTag(data, localStorage.getItem("login")).then(() =>
       setIsLoaded(false)
     );

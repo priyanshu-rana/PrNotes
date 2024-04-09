@@ -141,15 +141,15 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                       })
                   );
                 }}
-                suffix={
-                  <Button
-                    className="hover:text-red-500"
-                    // TODO: On this button click remove Uploaded File from Firebase Storage and the AttachmentUrl from Database
-                    // onClick={() => formProps.setFieldValue("image", null)}
-                  >
-                    X
-                  </Button>
-                }
+                // suffix={
+                //   <Button
+                //     className="hover:text-red-500"
+                //     // TODO: On this button click remove Uploaded File from Firebase Storage and the AttachmentUrl from Database
+                //     // onClick={() => formProps.setFieldValue("image", null)}
+                //   >
+                //     X
+                //   </Button>
+                // }
               />
               <div className="flex ">
                 <Input
