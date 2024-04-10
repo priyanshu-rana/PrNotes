@@ -44,6 +44,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [tagName, setTagName] = useState("");
+  const [isDeleteTag, setIsDeleteTag] = useState(false);
   const trimmedTagName = tagName.trim();
 
   const attachmentUpload = (event: Event) => {
@@ -68,7 +69,10 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       open={open}
       closable
       footer={false}
-      onCancel={onCancel}
+      onCancel={() => {
+        setIsDeleteTag(false);
+        onCancel();
+      }}
       title={!noteDataForUpdate._id ? "Add note" : "Update note"}
       destroyOnClose
     >
@@ -192,7 +196,10 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                     selectedTagIds.includes(tag._id)
                       ? "bg-blue-600"
                       : "bg-gray-400"
-                  } text-white rounded-full py-1 px-2`}
+                  } text-white rounded-full py-1 px-2 ${
+                    isDeleteTag &&
+                    "bg-red-400 hover:bg-red-500 hover:animate-bounce"
+                  }`}
                   type="button"
                   onClick={() => {
                     setSelectedTagIds(
@@ -210,6 +217,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   <button
                     type="button"
                     className="flex items-center space-x-2 bg-red-500 rounded-full px-2 py-1 text-white text-xs font-bold"
+                    onClick={() => setIsDeleteTag(true)}
                   >
                     <RiDeleteBinLine size={16} />
                     <h1>Delete Tag</h1>
