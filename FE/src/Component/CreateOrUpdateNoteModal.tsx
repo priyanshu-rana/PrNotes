@@ -28,6 +28,7 @@ type CreateOrUpdateNoteModalProps = {
   handleCreateNote: (data: NoteType) => void;
   handleUpdateNote: (data: NoteType) => void;
   handleCreateTag: (data: { title: string }) => void;
+  handleDeleteTag: (tagId: string) => void;
   tagList?: { _id: string; title: string }[];
 };
 
@@ -39,6 +40,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   noteDataForUpdate,
   tagList,
   handleCreateTag,
+  handleDeleteTag,
 }) => {
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
@@ -56,6 +58,18 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
     uploadBytes(attachmentRef, attachment).then((snapshot) =>
       getDownloadURL(snapshot.ref).then((url) => setAttachmentUrl(url))
     );
+  };
+
+  const handleTagClick = (tag: { _id: string; title: string }) => {
+    if (!isDeleteTag) {
+      setSelectedTagIds(
+        selectedTagIds.includes(tag._id)
+          ? selectedTagIds.filter((t) => t !== tag._id) //Check whether tag already present in the list, if yes then removes that tag
+          : [...selectedTagIds, tag._id]
+      );
+    } else {
+      handleDeleteTag(tag._id);
+    }
   };
 
   useEffect(() => {
@@ -201,13 +215,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                     "bg-red-400 hover:bg-red-500 hover:animate-bounce"
                   }`}
                   type="button"
-                  onClick={() => {
-                    setSelectedTagIds(
-                      selectedTagIds.includes(tag._id)
-                        ? selectedTagIds.filter((t) => t !== tag._id) //Check whether tag already present in the list, if yes then removes that tag
-                        : [...selectedTagIds, tag._id]
-                    );
-                  }}
+                  onClick={() => handleTagClick(tag)}
                 >
                   {tag.title}
                 </button>
@@ -216,11 +224,13 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="flex items-center space-x-2 bg-red-500 rounded-full px-2 py-1 text-white text-xs font-bold"
-                    onClick={() => setIsDeleteTag(true)}
+                    className={`flex items-center space-x-2 rounded-full px-2 py-1 text-white text-xs font-bold ${
+                      !isDeleteTag ? "bg-red-500" : "bg-blue-500"
+                    }`}
+                    onClick={() => setIsDeleteTag(!isDeleteTag)}
                   >
                     <RiDeleteBinLine size={16} />
-                    <h1>Delete Tag</h1>
+                    <h1>{!isDeleteTag ? "Delete Tag" : "Cancel"}</h1>
                   </button>
                 </div>
               )}

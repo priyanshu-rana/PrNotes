@@ -4,6 +4,7 @@ import {
   createNote,
   createTag,
   deleteNote,
+  deleteTag,
   getNotes,
   getTagList,
   updateNote,
@@ -87,6 +88,13 @@ const HomePage: FC<HomePageProps> = (props) => {
     createTag(data, localStorage.getItem("login")).then(() =>
       setIsLoaded(false)
     );
+  };
+
+  const handleDeleteTag = (tagId: string) => {
+    deleteTag(tagId, localStorage.getItem("login")).then(() => {
+      toast.error("Tag deleted successfully!");
+      setIsLoaded(false);
+    });
   };
 
   const handleTagClick = (tagId: string) => {
@@ -286,6 +294,7 @@ const HomePage: FC<HomePageProps> = (props) => {
         handleCreateNote={handleCreateNote}
         handleUpdateNote={handleUpdateNote}
         handleCreateTag={handleCreateTag}
+        handleDeleteTag={handleDeleteTag}
         noteDataForUpdate={noteDataForUpdate}
         onCancel={() => {
           setIsModalVisible(false);
