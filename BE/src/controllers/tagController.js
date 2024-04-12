@@ -37,7 +37,27 @@ const deleteTag = async (req, res) => {
   const tagId = req.params.tagId;
   try {
     await tagModel.findByIdAndDelete(tagId);
-    res.status(202).json({ message: "Tag deleted successfully !" });
+    res.status(202).json({ message: "Tag is deleted successfully !" });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: error.message, message: "Something went wrong !" });
+  }
+};
+
+const deleteTags = async (req, res) => {
+  const tagIds = req.body.tagIds;
+  console.log("tagIds:::", tagIds);
+  try {
+    if (!tagIds.length) {
+      return res.status(500).json({ message: "Provided No Tags !" });
+    }
+    const deletionPromise = tagIds.map(async (tagId) => {
+      await tagModel.findByIdAndDelete(tagId);
+    });
+    await Promise.all(deletionPromise);
+    res.status(200).json({ message: "Tags are deleted successfully !" });
   } catch (error) {
     console.log(error);
     res
@@ -50,4 +70,5 @@ module.exports = {
   createTag,
   deleteTag,
   getTagList,
+  deleteTags,
 };
