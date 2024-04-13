@@ -128,3 +128,19 @@ export const deleteTag = async (tagId: string, auth_token: string | null) => {
     throw new Error("Unable to delete tag");
   }
 };
+
+//TODO: Not tested & Implemented yet, so, Test & implement accordingly
+export const deleteTags = async (
+  tagIds: string[],
+  auth_token: string | null
+) => {
+  try {
+    axios.delete(`${VITE_REACT_APP_BACKEND_URL}/tag/delete-tags`, {
+      data: { tagIds },
+      headers: { Authorization: auth_token },
+    });
+  } catch (error) {
+    console.log(error);
+    throw new Error("Unable to delete tags");
+  }
+};
