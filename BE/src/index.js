@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const app = express();
 const dotenv = require("dotenv");
 const cors = require("cors");
+const batteryWarriorRouter = require("./routes/batteryWarriorRouter");
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 app.use("/user", userRouter);
 app.use("/note", noteRouter);
 app.use("/tag", tagRouter);
+app.use("/battery-warrior", batteryWarriorRouter);
 
 mongoose
   .connect(process.env.MONGO_URL)
