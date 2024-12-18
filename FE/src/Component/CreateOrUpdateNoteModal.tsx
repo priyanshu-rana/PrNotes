@@ -55,17 +55,6 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   });
   const trimmedTagName = tagName.trim();
 
-  const attachmentUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const files = target.files![0];
-    setAttachment(files);
-    if (attachment == null) return;
-    const attachmentRef = ref(storage, `attachments/${attachment.name + v4()}`);
-    uploadBytes(attachmentRef, attachment).then((snapshot) =>
-      getDownloadURL(snapshot.ref).then((url) => setAttachmentUrl(url))
-    );
-  };
-
   const handleTagClick = (tag: { _id: string; title: string }) => {
     if (!isDeleteTag) {
       setSelectedTagIds(
@@ -91,9 +80,9 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       footer={false}
       onCancel={() => {
         setIsDeleteTag(false);
-        setPreviewFile({ url: "", type: "" });
         onCancel();
       }}
+      afterClose={() => setPreviewFile({ url: "", type: "" })}
       title={!noteDataForUpdate._id ? "Add note" : "Update note"}
       destroyOnClose
     >
@@ -202,15 +191,22 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                     setPreviewFile({ url: previewUrl, type: selectedFileType });
                   }
                 }}
-                // suffix={
-                //   <Button
-                //     className="hover:text-red-500"
-                //     // TODO: On this button click remove Uploaded File from Firebase Storage and the AttachmentUrl from Database
-                //     // onClick={() => formProps.setFieldValue("image", null)}
-                //   >
-                //     X
-                //   </Button>
-                // }
+                // TODO: The file the name shouldn't be there after removing/deattaching file
+                suffix={
+                  previewFile.url ? (
+                    <Button
+                      className="hover:text-red-500 text-white bg-red-600"
+                      onClick={() => {
+                        formProps.setFieldValue("attachment", undefined);
+                        setPreviewFile({ url: "", type: "" });
+                      }}
+                    >
+                      X
+                    </Button>
+                  ) : (
+                    <></>
+                  )
+                }
               />
               <div className="flex ">
                 <Input

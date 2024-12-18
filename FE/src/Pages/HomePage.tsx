@@ -158,10 +158,10 @@ const HomePage: FC<HomePageProps> = (props) => {
         >
           + Add Note
         </button>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap space-x-2">
           {activeTags?.map((tag) => (
             <button
-              className={`bg-white rounded-full px-2 py-1 ${
+              className={`bg-white rounded-full px-2 py-1 mt-2 ${
                 selectedTag.includes(tag._id) &&
                 "bg-green-400 font-semibold text-blue-700"
               }`}
