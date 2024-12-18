@@ -1,4 +1,4 @@
-import { Button, Input, Modal } from "antd";
+import { Button, Image, Input, Modal } from "antd";
 import { Formik } from "formik";
 import { FC, memo, useEffect, useState } from "react";
 import { storage } from "../firebase";
@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import { RiDeleteBinLine } from "react-icons/ri";
 import TextArea from "antd/es/input/TextArea";
+import axios from "axios";
 
 export type NoteType = {
   title: string;
@@ -42,11 +43,16 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
   handleCreateTag,
   handleDeleteTag,
 }) => {
+  const { VITE_REACT_APP_BACKEND_URL } = import.meta.env;
   const [attachment, setAttachment] = useState<any>(null);
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [tagName, setTagName] = useState("");
   const [isDeleteTag, setIsDeleteTag] = useState(false);
+  const [previewFile, setPreviewFile] = useState<{ url: any; type: any }>({
+    url: "",
+    type: "",
+  });
   const trimmedTagName = tagName.trim();
 
   const attachmentUpload = (event: Event) => {
@@ -85,23 +91,64 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
       footer={false}
       onCancel={() => {
         setIsDeleteTag(false);
+        setPreviewFile({ url: "", type: "" });
         onCancel();
       }}
       title={!noteDataForUpdate._id ? "Add note" : "Update note"}
       destroyOnClose
     >
       <Formik
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           const noteData: NoteType = {
             title: values.title,
             description: values.description,
-            attachmentUrl: values.attachmentUrl,
+            // attachmentUrl: values.attachmentUrl,
             tagIds: selectedTagIds,
           };
 
-          !noteDataForUpdate._id
-            ? handleCreateNote(noteData)
-            : handleUpdateNote(noteData);
+          if (values.attachment) {
+            const attachment = values.attachment;
+            const fileName = attachment.name;
+            const contentType = attachment.type;
+
+            try {
+              const response = await axios.post(
+                `${VITE_REACT_APP_BACKEND_URL}/file/signed-url`,
+                {
+                  fileName,
+                  contentType,
+                },
+                {
+                  headers: {
+                    Authorization: localStorage.getItem("login"),
+                  },
+                }
+              );
+              const { url, path } = response.data;
+
+              await axios.put(url, attachment, {
+                headers: {
+                  "Content-Type": contentType,
+                },
+              });
+
+              const attachmentRef = ref(storage, path);
+              const attachmentUrl = await getDownloadURL(attachmentRef);
+
+              noteData.attachmentUrl = attachmentUrl;
+
+              !noteDataForUpdate._id
+                ? handleCreateNote(noteData)
+                : handleUpdateNote(noteData);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            // If no file/attachment selected
+            !noteDataForUpdate._id
+              ? handleCreateNote(noteData)
+              : handleUpdateNote(noteData);
+          }
         }}
         initialValues={
           !noteDataForUpdate
@@ -111,6 +158,7 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                 description: "",
                 attachmentUrl: "",
                 tagIds: [],
+                attachment,
               }
             : {
                 title: noteDataForUpdate.title || "",
@@ -146,18 +194,13 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
               <Input
                 type="file"
                 onChange={(e: any) => {
-                  // TODO: Add modal for confirmation of file upload (e.g. wether you wanna upload this attachment??)
-                  const attachmentRef = ref(
-                    storage,
-                    `attachments/${e.target.files[0].name + v4()}`
-                  );
-                  uploadBytes(attachmentRef, e.target.files[0]).then(
-                    (snapshot) =>
-                      getDownloadURL(snapshot.ref).then((url) => {
-                        // setAttachmentUrl(url);
-                        formProps.setFieldValue("attachmentUrl", url);
-                      })
-                  );
+                  if (e.target.files && e.target.files[0]) {
+                    const selectedFile = e.target.files[0];
+                    const selectedFileType = selectedFile.type.split("/")[0];
+                    const previewUrl = URL.createObjectURL(selectedFile);
+                    formProps.setFieldValue("attachment", selectedFile);
+                    setPreviewFile({ url: previewUrl, type: selectedFileType });
+                  }
                 }}
                 // suffix={
                 //   <Button
@@ -175,6 +218,20 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
                   className="hidden"
                   value={formProps.values.attachmentUrl}
                 />
+
+                {previewFile.type == "image" && (
+                  <div>
+                    <Image src={previewFile.url} alt="Preview" />
+                  </div>
+                )}
+                {previewFile.type == "video" && (
+                  <div>
+                    <video controls style={{ maxWidth: "400px" }}>
+                      <source src={previewFile.url} />
+                      Your browser does not support the video element.
+                    </video>
+                  </div>
+                )}
                 <img className="w-3/4" src={formProps.values.attachmentUrl} />
               </div>
             </div>
@@ -251,3 +308,10 @@ const CreateOrUpdateNoteModal: FC<CreateOrUpdateNoteModalProps> = ({
 CreateOrUpdateNoteModal.defaultProps = {};
 
 export default memo(CreateOrUpdateNoteModal);
+
+// TODO:
+// <Button
+//   onClick={() => formProps.setFieldValue("file", null)}  // Remove file from Formik state
+// >
+//   Remove File
+// </Button>
