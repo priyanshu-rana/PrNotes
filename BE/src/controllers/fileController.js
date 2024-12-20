@@ -31,4 +31,15 @@ const generateSignedUrl = async (req, res) => {
   }
 };
 
-module.exports = { generateSignedUrl };
+const deleteFile = async (filePath) => {
+  try {
+    const file = bucket.file(filePath);
+    await file.delete();
+    console.log(filePath, "File deleted successfully");
+  } catch (error) {
+    console.error(error);
+    throw new Error(error, "Failed to delete file");
+  }
+};
+
+module.exports = { generateSignedUrl, deleteFile };

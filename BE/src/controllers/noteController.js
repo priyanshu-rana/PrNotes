@@ -1,5 +1,7 @@
 const admin = require("firebase-admin");
 const noteModel = require("../models/noteModel");
+const { deleteFile } = require("./fileController");
+const { extractFilePathFromUrl } = require("../helper");
 
 const createNote = async (req, res) => {
   try {
@@ -56,7 +58,12 @@ const getNotes = async (req, res) => {
 const deleteNote = async (req, res) => {
   const noteId = req.params.noteId; //noteId is from paramas --> line.no 14 noteRoutes
   try {
-    const note = await noteModel.findByIdAndDelete(noteId);
+    const note = await noteModel.findById(noteId);
+    if (note.attachmentUrl) {
+      const attachementPath = extractFilePathFromUrl(note.attachmentUrl);
+      deleteFile(attachementPath);
+    }
+    await noteModel.findByIdAndDelete(note._id);
     res.status(202).json(note);
   } catch (error) {
     console.log(error);
