@@ -21,14 +21,14 @@ export const signUp = async (data: {
 
 export const signIn = async (data: { email: string; password: string }) => {
   try {
-    await axios
-      .post(`${VITE_REACT_APP_BACKEND_URL}/user/signin`, { ...data })
-      .then((res) => {
-        localStorage.setItem("login", res.data.token);
-        console.log("sigin sucessful");
-      });
-  } catch (error) {
+    const res = await axios.post(`${VITE_REACT_APP_BACKEND_URL}/user/signin`, {
+      ...data,
+    });
+    localStorage.setItem("login", res.data.token);
+    console.log("sigin sucessful");
+  } catch (error: any) {
     console.log(error);
+    throw error.response.data.message;
   }
 };
 

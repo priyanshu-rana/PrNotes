@@ -28,18 +28,18 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
         <h1 className="text-3xl text-gray-800 mb-6">Login</h1>
         <Formik
           initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => {
+          onSubmit={async (values) => {
             setIsLoading(true);
-            signIn(values)
-              .then(() => {
-                toast.success("Login Successful !!");
-                navigate("/");
-              })
-              .catch((e) => {
-                console.log(e);
-                toast.error(e);
-              })
-              .finally(() => setIsLoading(false));
+            try {
+              await signIn(values);
+              toast.success("Login Successful !!");
+              navigate("/");
+            } catch (error: any) {
+              console.error("Error SignIn:", error);
+              toast.error(error || "An error occurred, please try again.");
+            } finally {
+              setIsLoading(false);
+            }
           }}
         >
           {(formProps) => (
@@ -60,7 +60,7 @@ const LoginSignup: FC<LoginSignupProps> = (props) => {
                 htmlType="submit"
                 type="primary"
                 loading={isLoading}
-                className="bg-purple-600 text-white rounded  px-4 hover:bg-purple-700"
+                className="bg-purple-600 text-white rounded px-4"
               >
                 Login
               </Button>

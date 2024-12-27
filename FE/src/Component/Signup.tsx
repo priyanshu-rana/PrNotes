@@ -1,14 +1,17 @@
 import { Formik } from "formik";
-import { FC, memo } from "react";
+import { FC, memo, useState } from "react";
 import { signUp } from "../Service/ApiService";
 import PasswordInput from "./PasswordInput";
 import { toast } from "react-toastify";
+import { Button } from "antd";
 
 type SignupProps = {
   onClick: () => void;
 };
 
 const Signup: FC<SignupProps> = (props) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const signupInitialValues = {
     first_name: "",
     last_name: "",
@@ -20,11 +23,12 @@ const Signup: FC<SignupProps> = (props) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-700 via-pink-600 to-red-500">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-800 to-blue-900">
       <div className="bg-white p-8 min-w-360 rounded shadow-lg">
         <h1 className="text-3xl text-gray-800 mb-6">Signup</h1>
         <Formik
-          onSubmit={(values) =>
+          onSubmit={(values) => {
+            setIsLoading(true);
             signUp(values)
               .then(() => {
                 handleNavigateLogin();
@@ -33,7 +37,8 @@ const Signup: FC<SignupProps> = (props) => {
                 );
               })
               .catch((e) => toast.error(e.response.data.message ?? e.message))
-          }
+              .finally(() => setIsLoading(false));
+          }}
           initialValues={signupInitialValues}
         >
           {(formProps) => (
@@ -66,13 +71,15 @@ const Signup: FC<SignupProps> = (props) => {
                 value={formProps.values.password}
                 onChange={formProps.handleChange}
               />
-              <button
-                type="submit"
+              <Button
+                htmlType="submit"
+                type="primary"
+                loading={isLoading}
                 // onClick={() => formProps.handleSubmit()}
-                className="bg-purple-600 text-white rounded py-2 px-4 hover:bg-purple-700"
+                className="bg-purple-600 text-white rounded  px-4 "
               >
                 SignUp
-              </button>
+              </Button>
             </form>
           )}
         </Formik>
