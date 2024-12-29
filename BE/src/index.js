@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 const app = express();
 const dotenv = require("dotenv");
 const cors = require("cors");
+const cron = require("node-cron");
+const axios = require("axios");
 const fileRouter = require("./routes/fileRouters");
 
 dotenv.config();
@@ -22,6 +24,23 @@ app.use("/user", userRouter);
 app.use("/note", noteRouter);
 app.use("/tag", tagRouter);
 app.use("/file", fileRouter);
+
+app.get("/server", (req, res) => {
+  res.send("Server is active!");
+});
+
+// Self-pinging job runs in every 14min btw 7AM-12AM (Active hrs)
+cron.schedule("*/14 7-23 * * *", async () => {
+  try {
+    await axios.get(`${process.env.SERVER_URL}/server`);
+    console.log("Server is active!");
+  } catch (error) {
+    console.log(
+      "Server pinging mechanism is facing some issue:",
+      error.message
+    );
+  }
+});
 
 mongoose
   .connect(process.env.MONGO_URL)
