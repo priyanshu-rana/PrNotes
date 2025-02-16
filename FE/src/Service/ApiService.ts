@@ -46,9 +46,9 @@ export const createNote = async (data: NoteType, auth_token: string | null) => {
     });
 };
 
-export const updateNote = async (
+export const updateNoteAPI = async (
   noteId: string | number,
-  data: NoteType | { done: boolean },
+  data: NoteType,
   auth_token: string | null
 ) => {
   try {

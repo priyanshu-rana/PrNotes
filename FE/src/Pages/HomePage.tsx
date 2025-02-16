@@ -5,9 +5,8 @@ import {
   createTag,
   deleteNote,
   deleteTag,
-  getNotes,
   getTagList,
-  updateNote,
+  updateNoteAPI,
 } from "../Service/ApiService";
 import { Button, Collapse, Image } from "antd";
 import Header from "../Component/Header";
@@ -17,28 +16,22 @@ import { MdDoneAll, MdRemoveDone } from "react-icons/md";
 import CreateOrUpdateNoteModal, {
   NoteType,
 } from "../Component/CreateOrUpdateNoteModal";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchNotes, updateNote } from "../redux/actions/noteActions";
+import { RootState } from "../redux/reducers/rootReducer";
 
 type HomePageProps = {};
 
 const HomePage: FC<HomePageProps> = (props) => {
-  const [notes, setNotes] = useState<
-    {
-      _id: string;
-      title: string;
-      description: string;
-      done: boolean;
-      attachmentUrl: string;
-      tagIds: [];
-    }[]
-  >([]);
+  const dispatch = useDispatch();
+  const { notes, loading } = useSelector((state: RootState) => state.notes);
+
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [noteDataForUpdate, setNoteDataForUpdate] = useState<{
-    _id: string;
-    title?: string;
-    description?: string;
-    attachmentUrl?: string;
-    tagIds?: [];
-  }>({ _id: "", title: "", description: "" });
+  const [noteDataForUpdate, setNoteDataForUpdate] = useState<NoteType>({
+    _id: "",
+    title: "",
+    description: "",
+  });
   const [isLoaded, setIsLoaded] = useState(false);
   const [tagList, setTagList] = useState<{ _id: string; title: string }[]>();
   const [selectedTag, setSelectedTag] = useState<string[]>([]);
@@ -49,9 +42,9 @@ const HomePage: FC<HomePageProps> = (props) => {
     }[]
   >();
 
-  const filterdNotes = notes.filter((note) => {
+  const filteredNotes = notes.filter((note) => {
     if (selectedTag.length == 0) return true;
-    return note.tagIds.some((tagId) => selectedTag.includes(tagId));
+    return note.tagIds?.some((tagId) => selectedTag.includes(tagId));
   });
 
   const handleCreateNote = (data: NoteType) => {
@@ -65,7 +58,7 @@ const HomePage: FC<HomePageProps> = (props) => {
   };
 
   const handleUpdateNote = (data: NoteType) => {
-    updateNote(noteDataForUpdate._id, data, localStorage.getItem("login"))
+    updateNoteAPI(noteDataForUpdate._id!, data, localStorage.getItem("login"))
       .then(() => {
         setIsLoaded(false);
         toast.success("Note updated successfully!");
@@ -75,13 +68,12 @@ const HomePage: FC<HomePageProps> = (props) => {
       .catch((e) => toast.error(e));
   };
 
-  const handleMarkNote = async (noteId: string, done: boolean) => {
-    await updateNote(noteId, { done: done }, localStorage.getItem("login"))
-      .then(() => {
-        setIsLoaded(false);
-        setNoteDataForUpdate({ _id: "", description: "", title: "" });
-      })
-      .catch((e) => toast.error(e));
+  const handleMarkNote = async (
+    noteId: string,
+    title: string,
+    done: boolean
+  ) => {
+    dispatch(updateNote({ _id: noteId, title, done }));
   };
 
   const handleCreateTag = (data: { title: string }) => {
@@ -105,33 +97,37 @@ const HomePage: FC<HomePageProps> = (props) => {
     }
   };
 
-  useEffect(() => {
-    const login = localStorage.getItem("login");
-    if (!isLoaded) {
-      getNotes(login)
-        .then((notes) => {
-          setNotes(notes);
-          setIsLoaded(true);
-        })
-        .catch((error) => {
-          console.log(error);
-          setNotes(undefined as any); // for handling error due to api fail
-          setIsLoaded(true);
-        });
+  // useEffect(() => {
+  //   const login = localStorage.getItem("login");
+  //   if (!isLoaded) {
+  //     getNotes(login)
+  //       .then((notes) => {
+  //         setNotes(notes);
+  //         setIsLoaded(true);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //         setNotes(undefined as any); // for handling error due to api fail
+  //         setIsLoaded(true);
+  //       });
 
-      getTagList(login)
-        .then((tag) => setTagList(tag))
-        .then(() => setIsLoaded(true))
-        .catch((e) => {
-          toast.error(e);
-          setIsLoaded(true);
-        });
-    }
-  }, [isLoaded]);
+  //     getTagList(login)
+  //       .then((tag) => setTagList(tag))
+  //       .then(() => setIsLoaded(true))
+  //       .catch((e) => {
+  //         toast.error(e);
+  //         setIsLoaded(true);
+  //       });
+  //   }
+  // }, [isLoaded]);
 
   useEffect(() => {
-    const allActiveTagIds: string[] = notes.reduce((acc, note) => {
-      note.tagIds.forEach((tagId) => {
+    dispatch(fetchNotes());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const allActiveTagIds: string[] = notes.reduce<string[]>((acc, note) => {
+      note.tagIds?.forEach((tagId) => {
         if (!acc.includes(tagId)) {
           acc.push(tagId);
         }
@@ -172,7 +168,7 @@ const HomePage: FC<HomePageProps> = (props) => {
           ))}
         </div>
       </div>
-      {isLoaded ? (
+      {!loading ? (
         // <div className="flex flex-col shrink-0 grow space-y-2 md:w-1/2">
         <div className="space-y-2 lg:w-1/2">
           {notes ? (
@@ -194,8 +190,8 @@ const HomePage: FC<HomePageProps> = (props) => {
               </a>
             </h1>
           )}
-          {filterdNotes &&
-            filterdNotes.map((n, i) => (
+          {filteredNotes &&
+            filteredNotes.map((n, i) => (
               <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
                 <div
                   className={`text-white p-4 space-x-1 flex items-center justify-between
@@ -216,18 +212,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                     <button
                       className={n.done ? "text-green-400" : "text-red-400"}
                       onClick={() => {
-                        setNoteDataForUpdate({ _id: n._id });
-                        handleMarkNote(n._id, !n.done)
-                          .then(() =>
-                            !n.done
-                              ? toast.success(
-                                  `Great, you have done: ${n.title}`
-                                )
-                              : toast.success(
-                                  `Opps, removed ' ${n.title} ' from done`
-                                )
-                          )
-                          .catch((e) => console.log(e));
+                        handleMarkNote(n._id!, n.title ?? "Note", !n.done);
                       }}
                     >
                       {n.done ? (
@@ -248,7 +233,7 @@ const HomePage: FC<HomePageProps> = (props) => {
                     <button
                       className="text-red-500 font-extrabold"
                       onClick={() => {
-                        deleteNote(n._id, localStorage.getItem("login"))
+                        deleteNote(n._id!, localStorage.getItem("login"))
                           .then(() => {
                             setIsLoaded(false);
                             toast.success("Note is deleted sucessfully!!");

@@ -9,8 +9,9 @@ import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 
 export type NoteType = {
-  title: string;
-  description: string;
+  _id?: string;
+  title?: string;
+  description?: string;
   attachmentUrl?: File | null | string | any; //TODO replace any after MVP
   done?: boolean;
   tagIds?: string[];
@@ -20,7 +21,7 @@ type CreateOrUpdateNoteModalProps = {
   open: boolean;
   onCancel: () => void;
   noteDataForUpdate: {
-    _id: string;
+    _id?: string;
     title?: string;
     description?: string;
     attachmentUrl?: string;
