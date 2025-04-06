@@ -17,6 +17,7 @@ import { MdDoneAll, MdRemoveDone } from "react-icons/md";
 import CreateOrUpdateNoteModal, {
   NoteType,
 } from "../Component/CreateOrUpdateNoteModal";
+import SpeakButton from "../Component/SpeakButton";
 
 type HomePageProps = {};
 
@@ -62,6 +63,10 @@ const HomePage: FC<HomePageProps> = (props) => {
         setIsModalVisible(false);
       })
       .catch((e) => toast.error(e));
+  };
+
+  const handleNoteReady = (generatedNote: NoteType) => {
+    handleCreateNote(generatedNote);
   };
 
   const handleUpdateNote = (data: NoteType) => {
@@ -151,13 +156,17 @@ const HomePage: FC<HomePageProps> = (props) => {
     <div className="min-h-screen p-4 md:p-10  bg-gradient-to-r from-gray-800 to-blue-900 ">
       <Header />
       <div className="py-10 space-y-8">
-        <button
-          disabled={notes === undefined}
-          className="py-2 px-10 rounded-lg bg-white text-gray-800 font-semibold hover:scale-110 hover:ease-in-out disabled:scale-100 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          onClick={() => setIsModalVisible(true)}
-        >
-          + Add Note
-        </button>
+        <div className="flex items-center space-x-8">
+          <button
+            disabled={notes === undefined}
+            className="py-2 px-10 rounded-lg bg-white text-gray-800 font-semibold hover:scale-110 hover:ease-in-out disabled:scale-100 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={() => setIsModalVisible(true)}
+          >
+            + Add Note
+          </button>
+
+          <SpeakButton onNoteReady={handleNoteReady} />
+        </div>
         <div className="flex flex-wrap space-x-2">
           {activeTags?.map((tag) => (
             <button
