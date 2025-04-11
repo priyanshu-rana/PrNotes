@@ -9,6 +9,7 @@ const cors = require("cors");
 const cron = require("node-cron");
 const axios = require("axios");
 const fileRouter = require("./routes/fileRouters");
+const contactRoutes = require("./routes/contactRoutes");
 
 dotenv.config();
 
@@ -24,13 +25,14 @@ app.use("/user", userRouter);
 app.use("/note", noteRouter);
 app.use("/tag", tagRouter);
 app.use("/file", fileRouter);
+app.use("/api/contact", contactRoutes);
 
 app.get("/server", (req, res) => {
   res.send("Server is active!");
 });
 
-// Self-pinging job runs in every 14min btw 7AM-12AM (Active hrs)
-cron.schedule("*/14 7-23 * * *", async () => {
+// Self-pinging job runs every 14 minutes 24/7
+cron.schedule("*/14 * * * *", async () => {
   try {
     await axios.get(`${process.env.SERVER_URL}/server`);
     console.log("Server is active!");
