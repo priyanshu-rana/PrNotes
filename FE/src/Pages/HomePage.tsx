@@ -17,6 +17,7 @@ import { MdDoneAll, MdRemoveDone } from "react-icons/md";
 import CreateOrUpdateNoteModal, {
   NoteType,
 } from "../Component/CreateOrUpdateNoteModal";
+import VapiHandler from "../Component/VapiHandler";
 
 type HomePageProps = {};
 
@@ -158,6 +159,7 @@ const HomePage: FC<HomePageProps> = (props) => {
         >
           + Add Note
         </button>
+        <VapiHandler />
         <div className="flex flex-wrap space-x-2">
           {activeTags?.map((tag) => (
             <button
