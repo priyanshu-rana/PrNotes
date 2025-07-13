@@ -3,8 +3,10 @@ import { toast } from "react-toastify";
 import {
   createNote,
   createTag,
+  decryptNote,
   deleteNote,
   deleteTag,
+  encryptNote,
   getNotes,
   getTagList,
   updateNote,
@@ -13,10 +15,11 @@ import { Button, Collapse, Image } from "antd";
 import Header from "../Component/Header";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
-import { MdDoneAll, MdRemoveDone } from "react-icons/md";
+import { MdDoneAll, MdFileCopy, MdLock, MdRemoveDone } from "react-icons/md";
 import CreateOrUpdateNoteModal, {
   NoteType,
 } from "../Component/CreateOrUpdateNoteModal";
+import NoteProtectionModal from "../Component/NoteProtectionModal";
 
 type HomePageProps = {};
 
@@ -29,15 +32,20 @@ const HomePage: FC<HomePageProps> = (props) => {
       done: boolean;
       attachmentUrl: string;
       tagIds: [];
+      isProtected?: boolean;
     }[]
   >([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [openNoteProtectionModal, setOpenNoteProtectionModal] =
+    useState<boolean>(false);
+
   const [noteDataForUpdate, setNoteDataForUpdate] = useState<{
     _id: string;
     title?: string;
     description?: string;
     attachmentUrl?: string;
     tagIds?: [];
+    isProtected?: boolean;
   }>({ _id: "", title: "", description: "" });
   const [isLoaded, setIsLoaded] = useState(false);
   const [tagList, setTagList] = useState<{ _id: string; title: string }[]>();
@@ -49,7 +57,7 @@ const HomePage: FC<HomePageProps> = (props) => {
     }[]
   >();
 
-  const filterdNotes = notes.filter((note) => {
+  const filteredNotes = notes.filter((note) => {
     if (selectedTag.length == 0) return true;
     return note.tagIds.some((tagId) => selectedTag.includes(tagId));
   });
@@ -82,6 +90,45 @@ const HomePage: FC<HomePageProps> = (props) => {
         setNoteDataForUpdate({ _id: "", description: "", title: "" });
       })
       .catch((e) => toast.error(e));
+  };
+
+  const handleEncryptNote = async (noteId: string, secretKey: string) => {
+    await encryptNote(
+      noteId,
+      { secret_key: secretKey },
+      localStorage.getItem("login")
+    )
+      .then(() => {
+        setIsLoaded(false);
+        setOpenNoteProtectionModal(false);
+        toast.success("Note is protected successfully!");
+      })
+      .catch((e) => toast.error(e.message));
+  };
+
+  const handleDecryptNote = async (noteId: string, secretKey: string) => {
+    await decryptNote(
+      noteId,
+      { secret_key: secretKey },
+      localStorage.getItem("login")
+    )
+      .then(() => {
+        setIsLoaded(false);
+        setOpenNoteProtectionModal(false);
+        toast.success("Note is decrypted successfully!");
+      })
+      .catch((e) => toast.error(e.message));
+  };
+
+  const handleProtectNote = async (
+    noteId: string,
+    isProtected: boolean,
+    secret_key: string
+  ) => {
+    if (noteId)
+      isProtected
+        ? handleDecryptNote(noteId, secret_key)
+        : handleEncryptNote(noteId, secret_key);
   };
 
   const handleCreateTag = (data: { title: string }) => {
@@ -194,13 +241,42 @@ const HomePage: FC<HomePageProps> = (props) => {
               </a>
             </h1>
           )}
-          {filterdNotes &&
-            filterdNotes.map((n, i) => (
-              <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
-                <div
-                  className={`text-white p-4 space-x-1 flex items-center justify-between
+          {filteredNotes.map((n, i) => (
+            <div key={n._id} className="bg-white bg-opacity-20 rounded-2xl">
+              <div
+                className={`text-white p-4 space-x-1 flex items-center justify-between
               }`}
-                >
+              >
+                {n.isProtected ? (
+                  <div className="flex items-center w-full md:w-4/5">
+                    <div className="flex items-center bg-blue-900 bg-opacity-40 rounded-lg px-3 py-2 w-full">
+                      <div className="flex items-center space-x-3 w-full">
+                        <MdFileCopy
+                          className="border-2 border-dashed rounded-xl p-1"
+                          size={45}
+                        />
+
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <MdLock
+                              className="text-yellow-400 flex-shrink-0"
+                              size={20}
+                            />
+                            <div className="font-bold text-gray-200">
+                              Protected Note
+                            </div>
+                            <span className="text-xs bg-blue-500 bg-opacity-60 px-2 py-1 rounded-full">
+                              Locked
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-300 mt-1">
+                            Authenticate to view this content
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
                   <div
                     className={`${
                       n.done ? "line-through text-green-300" : ""
@@ -212,73 +288,100 @@ const HomePage: FC<HomePageProps> = (props) => {
                     </div>
                     <h1 className="break-all">{n.description}</h1>
                   </div>
-                  <div className="flex space-x-4">
+                )}
+                <div className="flex">
+                  <div className="mr-4">
                     <button
-                      className={n.done ? "text-green-400" : "text-red-400"}
+                      className={`${
+                        n.isProtected ? "text-green-400" : "text-red-400"
+                      }`}
                       onClick={() => {
-                        setNoteDataForUpdate({ _id: n._id });
-                        handleMarkNote(n._id, !n.done)
-                          .then(() =>
-                            !n.done
-                              ? toast.success(
-                                  `Great, you have done: ${n.title}`
-                                )
-                              : toast.success(
-                                  `Opps, removed ' ${n.title} ' from done`
-                                )
-                          )
-                          .catch((e) => console.log(e));
-                      }}
-                    >
-                      {n.done ? (
-                        <MdRemoveDone size={25} />
-                      ) : (
-                        <MdDoneAll size={25} />
-                      )}
-                    </button>
-                    <button
-                      className="text-blue-200 font-extrabold"
-                      onClick={() => {
-                        setNoteDataForUpdate(n);
-                        setIsModalVisible(true);
-                      }}
-                    >
-                      <FaEdit size={25} />
-                    </button>
-                    <button
-                      className="text-red-500 font-extrabold"
-                      onClick={() => {
-                        deleteNote(n._id, localStorage.getItem("login"))
-                          .then(() => {
-                            setIsLoaded(false);
-                            toast.success("Note is deleted sucessfully!!");
-                          })
-                          .catch((e) => console.log(e));
+                        console.log("n.isProtected", n.isProtected);
+                        console.log("noteDataForUpdate", noteDataForUpdate);
+                        setNoteDataForUpdate({
+                          _id: n._id,
+                          isProtected: n.isProtected,
+                        });
+                        console.log("noteDataForUpdate 2", noteDataForUpdate);
 
-                        // setNotes([...notes].filter((note) => note._id !== n._id));
+                        console.log("n.isProtected 2", n.isProtected);
+
+                        setOpenNoteProtectionModal(true);
                       }}
                     >
-                      <RiDeleteBinLine size={25} />
+                      <MdLock size={25} />
                     </button>
                   </div>
+                  {!n.isProtected && (
+                    <div className="flex space-x-4">
+                      <button
+                        className={n.done ? "text-green-400" : "text-red-400"}
+                        onClick={() => {
+                          setNoteDataForUpdate({ _id: n._id });
+                          handleMarkNote(n._id, !n.done)
+                            .then(() =>
+                              !n.done
+                                ? toast.success(
+                                    `Great, you have done: ${n.title}`
+                                  )
+                                : toast.success(
+                                    `Opps, removed ' ${n.title} ' from done`
+                                  )
+                            )
+                            .catch((e) => console.log(e));
+                        }}
+                      >
+                        {n.done ? (
+                          <MdRemoveDone size={25} />
+                        ) : (
+                          <MdDoneAll size={25} />
+                        )}
+                      </button>
+                      <button
+                        className="text-blue-200"
+                        onClick={() => {
+                          setNoteDataForUpdate(n);
+                          setIsModalVisible(true);
+                        }}
+                      >
+                        <FaEdit size={25} />
+                      </button>
+                      <button
+                        className="text-red-500"
+                        onClick={() => {
+                          deleteNote(n._id, localStorage.getItem("login"))
+                            .then(() => {
+                              setIsLoaded(false);
+                              toast.success("Note is deleted sucessfully!!");
+                            })
+                            .catch((e) => console.log(e));
+
+                          // setNotes([...notes].filter((note) => note._id !== n._id));
+                        }}
+                      >
+                        <RiDeleteBinLine size={25} />
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {n.attachmentUrl && (
-                  <Collapse
-                    className="font-extrabold border-none bg-cyan-50"
-                    items={[
-                      {
-                        label: "Attachment",
-                        children: (
-                          <div className="w-40">
-                            <Image src={n.attachmentUrl} />
-                          </div>
-                        ),
-                      },
-                    ]}
-                  />
-                )}
               </div>
-            ))}
+              {n.attachmentUrl && (
+                <Collapse
+                  className="font-extrabold border-none bg-cyan-50"
+                  items={[
+                    {
+                      label: "Attachment",
+                      children: (
+                        <div className="w-40">
+                          <Image src={n.attachmentUrl} />
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+            </div>
+          ))}
         </div>
       ) : (
         <Button
@@ -307,6 +410,15 @@ const HomePage: FC<HomePageProps> = (props) => {
           });
         }}
         tagList={tagList}
+      />
+      <NoteProtectionModal
+        title={noteDataForUpdate.isProtected ? "Unlock Note" : "Protect Note"}
+        isModalOpen={openNoteProtectionModal}
+        onCancel={() => {
+          setOpenNoteProtectionModal(false);
+        }}
+        note={noteDataForUpdate}
+        handleProtectNote={handleProtectNote}
       />
     </div>
   );

@@ -9,11 +9,13 @@ import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 
 export type NoteType = {
+  _id?: string; // Optional for creating a new note
   title: string;
   description: string;
   attachmentUrl?: File | null | string | any; //TODO replace any after MVP
   done?: boolean;
   tagIds?: string[];
+  isProtected?: boolean;
 };
 
 type CreateOrUpdateNoteModalProps = {

@@ -90,6 +90,42 @@ export const deleteNote = async (
   }
 };
 
+export const encryptNote = async (
+  noteId: string | number,
+  data: { secret_key: string },
+  auth_token: string | null
+) => {
+  try {
+    await axios.post(
+      `${VITE_REACT_APP_BACKEND_URL}/secret/encrypt/${noteId}`,
+      data,
+      {
+        headers: { Authorization: auth_token },
+      }
+    );
+  } catch (error: any) {
+    throw new Error(error.response.data.message || "Unable to encrypt Note!");
+  }
+};
+
+export const decryptNote = async (
+  noteId: string | number,
+  data: NoteType | { secret_key: string },
+  auth_token: string | null
+) => {
+  try {
+    await axios.post(
+      `${VITE_REACT_APP_BACKEND_URL}/secret/decrypt/${noteId}`,
+      data,
+      {
+        headers: { Authorization: auth_token },
+      }
+    );
+  } catch (error: any) {
+    throw new Error(error.response.data.message || "Unable to decrypt Note!");
+  }
+};
+
 export const getTagList = async (auth_token: string | null) => {
   try {
     const response = await axios.get(

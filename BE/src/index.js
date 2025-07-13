@@ -10,6 +10,7 @@ const cron = require("node-cron");
 const axios = require("axios");
 const fileRouter = require("./routes/fileRouters");
 const contactRoutes = require("./routes/contactRoutes");
+const secretRouter = require("./routes/secretRoutes.");
 
 dotenv.config();
 
@@ -25,7 +26,8 @@ app.use("/user", userRouter);
 app.use("/note", noteRouter);
 app.use("/tag", tagRouter);
 app.use("/file", fileRouter);
-app.use("/api/contact", contactRoutes);
+app.use("/api/contact", contactRoutes); //TODO: Fix name
+app.use("/secret", secretRouter);
 
 app.get("/server", (req, res) => {
   res.send("Server is active!");
