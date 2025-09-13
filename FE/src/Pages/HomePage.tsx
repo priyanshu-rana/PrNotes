@@ -11,7 +11,7 @@ import {
   getTagList,
   updateNote,
 } from "../Service/ApiService";
-import { Button, Collapse, Image } from "antd";
+import { Button, Collapse, Image, Modal } from "antd";
 import Header from "../Component/Header";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
@@ -38,6 +38,10 @@ const HomePage: FC<HomePageProps> = (props) => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [openNoteProtectionModal, setOpenNoteProtectionModal] =
     useState<boolean>(false);
+  const [pdfModalOpen, setPdfModalOpen] = useState<boolean>(false);
+  const [currentPdfUrl, setCurrentPdfUrl] = useState<string>("");
+  const [audioModalOpen, setAudioModalOpen] = useState<boolean>(false);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string>("");
 
   const [noteDataForUpdate, setNoteDataForUpdate] = useState<{
     _id: string;
@@ -373,7 +377,55 @@ const HomePage: FC<HomePageProps> = (props) => {
                       label: "Attachment",
                       children: (
                         <div className="w-40">
-                          <Image src={n.attachmentUrl} />
+                          {n.attachmentUrl.includes("pdf") ? (
+                            <button
+                              onClick={() => {
+                                setCurrentPdfUrl(n.attachmentUrl);
+                                setPdfModalOpen(true);
+                              }}
+                              className="w-full py-2 px-1 rounded-lg bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 text-white font-semibold shadow hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                              <span className="flex items-center justify-center gap-2">
+                                <MdFileCopy
+                                  className="text-blue-300"
+                                  size={20}
+                                />
+                                View PDF
+                              </span>
+                            </button>
+                          ) : n.attachmentUrl.includes("mp3") ||
+                            n.attachmentUrl.includes("wav") ||
+                            n.attachmentUrl.includes("ogg") ||
+                            n.attachmentUrl.includes("aac") ||
+                            n.attachmentUrl.includes("m4a") ? (
+                            <audio controls>
+                              <source src={n.attachmentUrl} />
+                              Your browser does not support the audio element.
+                            </audio>
+                          ) : n.attachmentUrl.includes("jpg") ||
+                            n.attachmentUrl.includes("jpeg") ||
+                            n.attachmentUrl.includes("png") ||
+                            n.attachmentUrl.includes("gif") ||
+                            n.attachmentUrl.includes("bmp") ||
+                            n.attachmentUrl.includes("webp") ||
+                            n.attachmentUrl.includes("svg") ? (
+                            <Image src={n.attachmentUrl} />
+                          ) : (
+                            <button
+                              onClick={() =>
+                                window.open(n.attachmentUrl, "_blank")
+                              }
+                              className="w-full py-2 px-1 rounded-lg bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 text-white font-semibold shadow hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                              <span className="flex items-center justify-center gap-2">
+                                <MdFileCopy
+                                  className="text-blue-300"
+                                  size={20}
+                                />
+                                Open Attachment
+                              </span>
+                            </button>
+                          )}
                         </div>
                       ),
                     },
@@ -420,6 +472,38 @@ const HomePage: FC<HomePageProps> = (props) => {
         note={noteDataForUpdate}
         handleProtectNote={handleProtectNote}
       />
+
+      {/* PDF Modal */}
+      <Modal
+        title="PDF Viewer"
+        open={pdfModalOpen}
+        onCancel={() => setPdfModalOpen(false)}
+        footer={
+          <div className="flex justify-end">
+            <button
+              className="py-1 px-4 rounded-lg bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 text-white font-semibold shadow hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onClick={() => window.open(currentPdfUrl, "_blank")}
+            >
+              Full Screen
+            </button>
+          </div>
+        }
+        width="90vw"
+        style={{ top: 20 }}
+        bodyStyle={{
+          height: "80vh",
+          overflow: "auto",
+          padding: 0,
+        }}
+      >
+        <iframe
+          src={currentPdfUrl}
+          width="100%"
+          height="100%"
+          style={{ border: "none", minHeight: "80vh" }}
+          title="PDF Viewer"
+        />
+      </Modal>
     </div>
   );
 };
